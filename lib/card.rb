@@ -10,7 +10,7 @@ class Card
   VALID_VALUES = (1..13).to_a
 
   def initialize(card_value, card_suit)
-    fail "Invalid suit: #{card_suit}" unless validate_card(card_suit)
+    fail "Invalid suit: #{card_suit}" unless validate_suit(card_suit)
     fail "Invalid value: #{card_value}" unless validate_value(card_value)
     @value = card_value
     @suit = card_suit
@@ -40,7 +40,7 @@ class Card
   end
 
 protected
-  def validate_card(c)
+  def validate_suit(c)
     Card::VALID_SUITS.include?(c)
   end
 
