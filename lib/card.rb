@@ -6,6 +6,9 @@ class Card
   QUEEN=12
   KING=13
 
+  VALID_SUITS = [:hearts, :spades, :clubs, :diamonds]
+  VALID_VALUES = (1..13).to_a
+
   def initialize(card_value, card_suit)
     fail "Invalid suit: #{card_suit}" unless validate_card(card_suit)
     fail "Invalid value: #{card_value}" unless validate_value(card_value)
@@ -38,10 +41,10 @@ class Card
 
 protected
   def validate_card(c)
-    [:hearts, :spades, :clubs, :diamonds].include?(c)
+    Card::VALID_SUITS.include?(c)
   end
 
   def validate_value(v)
-    (1..13).to_a.include?(v)
+    Card::VALID_VALUES.include?(v)
   end
 end

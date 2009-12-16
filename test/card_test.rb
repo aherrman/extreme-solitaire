@@ -7,8 +7,8 @@ require 'card'
 
 class CardTest < Test::Unit::TestCase
   def test_valid_cards_dont_throw_exceptions
-    [:hearts, :spades, :diamonds, :clubs].each { |suit|
-      (1..13).to_a.each { |val|
+    Card::VALID_SUITS.each { |suit|
+      Card::VALID_VALUES.each { |val|
         c = Card.new val, suit
       }
     }
@@ -138,8 +138,8 @@ class CardTest < Test::Unit::TestCase
   def test_different_cards_have_different_hash
     hash_results = {}
 
-    [:hearts, :spades, :diamonds, :clubs].each { |suit|
-      (1..13).to_a.each { |val|
+    Card::VALID_SUITS.each { |suit|
+      Card::VALID_VALUES.each { |val|
         c = Card.new val, suit
         h = c.hash
 
