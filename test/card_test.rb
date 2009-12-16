@@ -151,6 +151,64 @@ class CardTest < Test::Unit::TestCase
     assert_equal [], hash_results.values.select() { |v| v > 1 }
   end
 
+  def test_less_than
+    c1 = Card.new 9, :hearts
+    c2 = Card.new 10, :hearts
+
+    assert c1 < c2
+    assert !(c2 < c1)
+  end
+
+  def test_less_or_equal_when_less
+    c1 = Card.new 9, :hearts
+    c2 = Card.new 10, :hearts
+
+    assert c1 <= c2
+    assert !(c2 <= c1)
+  end
+
+  def test_less_or_equal_when_equal
+    c1 = Card.new 9, :hearts
+    c2 = Card.new 9, :hearts
+
+    assert c1 <= c2
+    assert c2 <= c1
+  end
+
+  def test_greater_than
+    c1 = Card.new 11, :hearts
+    c2 = Card.new 10, :hearts
+
+    assert c1 > c2
+    assert !(c2 > c1)
+  end
+
+  def test_greater_or_equal_when_greater
+    c1 = Card.new 11, :hearts
+    c2 = Card.new 10, :hearts
+
+    assert c1 >= c2
+    assert !(c2 >= c1)
+  end
+
+  def test_greater_or_equal_when_equal
+    c1 = Card.new 10, :hearts
+    c2 = Card.new 10, :hearts
+
+    assert c1 >= c2
+    assert c2 >= c1
+  end
+
+  def test_comparison_ignores_suit
+    c1 = Card.new 10, :hearts
+    c2 = Card.new 10, :clubs
+
+    assert c1 <= c2
+    assert c1 >= c2
+    assert !(c1 > c2)
+    assert !(c1 < c2)
+  end
+
   def test_to_s
     c = Card.new 2, :hearts
     assert_equal "2 of hearts", c.to_s
