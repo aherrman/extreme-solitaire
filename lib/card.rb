@@ -38,7 +38,7 @@ class Card
   # Checks if another Card is equal to this one
   def eql?(o)
     return false unless o.is_a?(Card)
-    return o.value == @value && o.suit == @suit
+    o.value == @value && o.suit == @suit
   end
 
   # Checks if another object's properties are equal to this one's.  This does
@@ -53,7 +53,7 @@ class Card
     end
   end
 
-  # Generates a unique has for the Card
+  # Generates a unique hash for the Card
   def hash
     @value.hash ^ @suit.hash
   end
