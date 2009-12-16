@@ -58,24 +58,24 @@ class CardTest < Test::Unit::TestCase
     c1 = Card.new 11, :hearts
     c2 = Card.new 10, :hearts
 
-    assert ! (c1 == c2)
-    assert ! (c2 == c1)
+    assert c1 != c2
+    assert c2 != c1
   end
 
   def test_inequality_when_suit_is_different_using_double_equals
     c1 = Card.new 10, :hearts
     c2 = Card.new 10, :clubs
 
-    assert ! (c1 == c2)
-    assert ! (c2 == c1)
+    assert c1 != c2
+    assert c2 != c1
   end
 
   def test_inequality_when_both_are_different_using_double_equals
     c1 = Card.new 10, :hearts
     c2 = Card.new 12, :clubs
 
-    assert ! (c1 == c2)
-    assert ! (c2 == c1)
+    assert c1 != c2
+    assert c2 != c1
   end
 
   def test_inequality_when_value_is_different_using_eql
