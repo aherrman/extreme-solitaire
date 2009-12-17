@@ -1,4 +1,4 @@
-# 
+# Unit tests for Card
 
 $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
@@ -212,5 +212,13 @@ class CardTest < Test::Unit::TestCase
   def test_to_s
     c = Card.new 2, :hearts
     assert_equal "2 of hearts", c.to_s
+  end
+
+  def test_dup
+    c1 = Card.new 2, :hearts
+    c2 = c1.dup
+
+    assert ! c1.equal?(c2)
+    assert c1.eql? c2
   end
 end

@@ -35,6 +35,11 @@ class Card
     @suit = card_suit
   end
 
+  # Duplicates the Card
+  def dup
+    Card.new @value, @suit
+  end
+
   # Checks if another Card is equal to this one
   def eql?(o)
     return false unless o.is_a?(Card)
