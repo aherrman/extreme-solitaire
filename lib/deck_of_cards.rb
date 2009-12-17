@@ -77,24 +77,23 @@ class DeckOfCards
   # Creates a shuffled copy of the deck.  This is just like shuffle! but returns
   # a new deck instead of changing the deck it was called on.
   def shuffle(count=1)
-    modify_dup(:shuffle!, count)
+    modify_dup(:shuffle!, count)[0]
   end
 
-  # Creates a new Deck that has the card at the given index removed.  If
-  # the +count+ argument is provided then that many elements starting from the
-  # index will be removed
-  def remove_cards(index, count=1)
-    modify_dup(:remove_cards!, index, count)
+  # Creates a new deck by appending the contents of the passed deck to the end
+  # of this one.
+  def append_deck(d)
+    modify_dup(:append_deck!, d)[0]
   end
 
-  # :call-seq:
-  #   insert_cards(index, card)
-  #   insert_cards(index, card1, card2, ...)
+  # Removes cards from the end of the deck, creating two new decks
+  # This returns both the new deck and the old one
   #
-  # Creates a new Deck based on the current one that has the given card(s) added
-  # at the requested position
-  def insert_cards(index, *args)
-    modify_dup(:insert_cards!, index, *args)
+  # ===Example
+  #   d1 = DeckOfCards.default_deck
+  #   newD1, poppedDeck = d1.remove_deck(4)
+  def remove_deck(size=1)
+    modify_dup(:remove_deck!, size)
   end
 
   # Creates a new Deck based on this one that has the last card popped from
@@ -103,6 +102,12 @@ class DeckOfCards
   #
   # This works like Array.pop except it returns a new version of the deck
   # instead of modifying the deck it was called on.
+  #
+  # This returns both the new deck and the popped cards
+  #
+  # ===Example
+  #   d1 = DeckOfCards.default_deck
+  #   newD1, poppedCards = d1.pop_deck(4)
   def pop_cards(n=1)
     modify_dup(:pop_cards!, n)
   end
@@ -113,34 +118,8 @@ class DeckOfCards
   #
   # Creates a new Deck based on this one that has the passed cards pushed to
   # the end of the deck.
-  #
-  # This works like Array.push except it returns a new version of the deck
-  # instead of modifying the deck it was called on.
   def push_cards(*args)
-    modify_dup(:push_cards!, *args)
-  end
-
-  # Creates a new Deck based on this one that has the first card removed from
-  # the deck.  If the argument +n+ is provided then the last +n+ cards are
-  # removed.
-  #
-  # This works like Array.shift except it returns a new version of the deck
-  # instead of modifying the deck it was called on.
-  def shift_cards(n=1)
-    modify_dup(:shift_cards!, n)
-  end
-
-  # :call-seq:
-  #   unshift_cards(card1)
-  #   unshift_cards(card1, card2, ...)
-  #
-  # Creates a new Deck based on this one that has the passed cards added to
-  # the beginning of the deck.
-  #
-  # This works like Array.unshift except it returns a new version of the deck
-  # instead of modifying the deck it was called on.
-  def unshift_cards(*args)
-    modify_dup(:unshift_cards!, *args)
+    modify_dup(:push_cards!, *args)[0]
   end
 
 # ------------------------------------------------------------------------------
@@ -158,54 +137,6 @@ class DeckOfCards
       @cards.shuffle!
       count -= 1
     end
-  end
-
-  # Removes the card at index +i+ from the deck.
-  def remove_cards!(index, count=1)
-    @cards.slice!(index, count)
-  end
-
-  # :call-seq:
-  #   insert_cards!(index, card)
-  #   insert_cards!(index, card1, card2, ...)
-  #
-  # Inserts a card at index +i+ in the deck.
-  def insert_cards!(i, *args)
-    @cards.insert(i, *args)
-  end
-
-  # Pops the last card from the deck.  If the argument +n+ is provided then the
-  # last +n+ cards are popped.
-  # This works just like Array.pop
-  def pop_cards!(n=1)
-    @cards.pop(n)
-  end
-
-  # :call-seq:
-  #   push_cards!(card1)
-  #   push_cards!(card1, card2, ...)
-  #
-  # Pushes cards to the end of the deck.
-  # This works just like Array.push
-  def push_cards!(*args)
-    @cards.push(*args)
-  end
-
-  # Shifts the first card from the deck.  If the argument +n+ is provided then
-  # the first +n+ cards are removed.
-  # This works just like Array.shift
-  def shift_cards!(n=1)
-    @cards.shift(n)
-  end
-
-  # :call-seq:
-  #   unshift_cards!(card1)
-  #   unshift_cards!(card1, card2, ...)
-  #
-  # Adds cards to the beginning of the deck
-  # This works just like Array.unshift
-  def unshift_cards!(*args)
-    @cards.unshift(*args)
   end
 
 # ------------------------------------------------------------------------------
@@ -275,9 +206,36 @@ protected
   # Helper method for the immutable versions of the deck modify methods.
   # This duplicates the deck, calls the requested method on the new deck, then
   # returns the new deck
+  #
+  # Returns both the new array and the results returned by the method
   def modify_dup(method, *args)
     d = self.dup
-    d.send(method, *args)
-    d
+    result = d.send(method, *args)
+    [d, result]
+  end
+
+  # Pops the last card from the deck.  If the argument +n+ is provided then the
+  # last +n+ cards are popped.  The removed cards are returned
+  def pop_cards!(n=1)
+    @cards.pop(n)
+  end
+
+  # :call-seq:
+  #   push_cards!(card1)
+  #   push_cards!(card1, card2, ...)
+  #
+  # Pushes cards to the end of the deck.
+  def push_cards!(*args)
+    @cards.push(*args)
+  end
+
+  # Appends the cards from the passed deck to the end of this deck.
+  def append_deck!(d)
+    @cards.send("push", *(d.cards))
+  end
+
+  # Pops cards from the end of the deck and returns them as a new deck
+  def remove_deck!(n=1)
+    DeckOfCards.new @cards.pop(n)
   end
 end

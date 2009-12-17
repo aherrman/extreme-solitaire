@@ -118,6 +118,17 @@ class DeckOfCardsTest < Test::Unit::TestCase
     assert d1.eql?(d2)
   end
 
+  def test_changing_dup_doesnt_change_original
+    # default deck is large enough that a shuffle should pretty much always
+    # result in a change
+    d1 = DeckOfCards.default_deck
+    d2 = d1.dup
+
+    d2.shuffle!
+
+    assert d1 != d2
+  end
+
   def test_shuffle_bang_modifies_self
     d1 = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
         Card.new(1, :hearts)]
@@ -238,82 +249,6 @@ class DeckOfCardsTest < Test::Unit::TestCase
     assert !(d.is_full_deck?)
   end
 
-  def test_remove_cards
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
-    d2 = d1.remove_cards(1, 2)
-
-    assert ! d1.equal?(d2)
-    assert d1 != d2
-
-    assert_equal 3, d2.size
-    assert_equal c1, d2.card(0)
-    assert_equal c4, d2.card(1)
-    assert_equal c5, d2.card(2)
-  end
-
-  def test_remove_cards_bang
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
-    rc1, rc2 = d1.remove_cards!(1, 2)
-
-    assert_equal 3, d1.size
-    assert_equal c1, d1.card(0)
-    assert_equal c4, d1.card(1)
-    assert_equal c5, d1.card(2)
-    assert_equal c2, rc1
-    assert_equal c3, rc2
-  end
-
-  def test_insert_cards
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3]
-    d2 = d1.insert_cards(1, c4, c5)
-
-    assert ! d1.equal?(d2)
-    assert d1 != d2
-
-    assert_equal 5, d2.size
-    assert_equal c1, d2.card(0)
-    assert_equal c4, d2.card(1)
-    assert_equal c5, d2.card(2)
-    assert_equal c2, d2.card(3)
-    assert_equal c3, d2.card(4)
-  end
-
-  def test_insert_cards_bang
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3]
-    d1.insert_cards!(1, c4, c5)
-
-    assert_equal 5, d1.size
-    assert_equal c1, d1.card(0)
-    assert_equal c4, d1.card(1)
-    assert_equal c5, d1.card(2)
-    assert_equal c2, d1.card(3)
-    assert_equal c3, d1.card(4)
-  end
-
   def test_pop_cards
     c1 = Card.new(1, :hearts)
     c2 = Card.new(10, :spades)
@@ -322,7 +257,7 @@ class DeckOfCardsTest < Test::Unit::TestCase
     c5 = Card.new(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
-    d2 = d1.pop_cards(2)
+    d2, popped = d1.pop_cards(2)
 
     assert ! d1.equal?(d2)
     assert d1 != d2
@@ -331,24 +266,10 @@ class DeckOfCardsTest < Test::Unit::TestCase
     assert_equal c1, d2.card(0)
     assert_equal c2, d2.card(1)
     assert_equal c3, d2.card(2)
-  end
 
-  def test_pop_cards_bang
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
-    rc1, rc2 = d1.pop_cards!(2)
-
-    assert_equal 3, d1.size
-    assert_equal c1, d1.card(0)
-    assert_equal c2, d1.card(1)
-    assert_equal c3, d1.card(2)
-    assert_equal c4, rc1
-    assert_equal c5, rc2
+    assert_equal 2, popped.size
+    assert_equal c4, popped[0]
+    assert_equal c5, popped[1]
   end
 
   def test_push_cards
@@ -372,7 +293,7 @@ class DeckOfCardsTest < Test::Unit::TestCase
     assert_equal c5, d2.card(4)
   end
 
-  def test_push_cards_bang
+  def test_append_deck
     c1 = Card.new(1, :hearts)
     c2 = Card.new(10, :spades)
     c3 = Card.new(3, :clubs)
@@ -380,17 +301,28 @@ class DeckOfCardsTest < Test::Unit::TestCase
     c5 = Card.new(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3]
-    d1.push_cards!(c4, c5)
+    d2 = DeckOfCards.new [c4, c5]
 
-    assert_equal 5, d1.size
-    assert_equal c1, d1.card(0)
-    assert_equal c2, d1.card(1)
-    assert_equal c3, d1.card(2)
-    assert_equal c4, d1.card(3)
-    assert_equal c5, d1.card(4)
+    # back up d1 and d2 so we can make sure they weren't changed
+    d1d = d1.dup
+    d2d = d2.dup
+
+    d3 = d1.append_deck d2
+
+    assert_equal d1, d1d
+    assert_equal d2, d2d
+    assert d3 != d1
+    assert d3 != d2
+
+    assert_equal 5, d3.size
+    assert_equal c1, d3[0]
+    assert_equal c2, d3[1]
+    assert_equal c3, d3[2]
+    assert_equal c4, d3[3]
+    assert_equal c5, d3[4]
   end
 
-  def test_shift_cards
+  def test_remove_deck
     c1 = Card.new(1, :hearts)
     c2 = Card.new(10, :spades)
     c3 = Card.new(3, :clubs)
@@ -398,72 +330,20 @@ class DeckOfCardsTest < Test::Unit::TestCase
     c5 = Card.new(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
-    d2 = d1.shift_cards(2)
+    d2, popped = d1.remove_deck(2)
 
     assert ! d1.equal?(d2)
     assert d1 != d2
 
     assert_equal 3, d2.size
-    assert_equal c3, d2.card(0)
-    assert_equal c4, d2.card(1)
-    assert_equal c5, d2.card(2)
-  end
+    assert_equal c1, d2[0]
+    assert_equal c2, d2[1]
+    assert_equal c3, d2[2]
 
-  def test_shift_cards_bang
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
-    rc1, rc2 = d1.shift_cards!(2)
-
-    assert_equal 3, d1.size
-    assert_equal c3, d1.card(0)
-    assert_equal c4, d1.card(1)
-    assert_equal c5, d1.card(2)
-    assert_equal c1, rc1
-    assert_equal c2, rc2
-  end
-
-  def test_unshift_cards
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3]
-    d2 = d1.unshift_cards(c4, c5)
-
-    assert ! d1.equal?(d2)
-    assert d1 != d2
-
-    assert_equal 5, d2.size
-    assert_equal c4, d2.card(0)
-    assert_equal c5, d2.card(1)
-    assert_equal c1, d2.card(2)
-    assert_equal c2, d2.card(3)
-    assert_equal c3, d2.card(4)
-  end
-
-  def test_unshift_cards_bang
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
-
-    d1 = DeckOfCards.new [c1, c2, c3]
-    d1.unshift_cards!(c4, c5)
-
-    assert_equal 5, d1.size
-    assert_equal c4, d1.card(0)
-    assert_equal c5, d1.card(1)
-    assert_equal c1, d1.card(2)
-    assert_equal c2, d1.card(3)
-    assert_equal c3, d1.card(4)
+    assert_equal 2, popped.size
+    assert popped.is_a?(DeckOfCards)
+    assert_equal c4, popped[0]
+    assert_equal c5, popped[1]
   end
 
   def default_deck_cards_array
