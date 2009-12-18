@@ -21,7 +21,7 @@ class DeckOfCards
     cards = []
     Card::VALID_SUITS.each { |suit|
       Card::VALID_VALUES.each { |val|
-        cards.push(Card.new val, suit)
+        cards.push(Card.get val, suit)
       }
     }
 

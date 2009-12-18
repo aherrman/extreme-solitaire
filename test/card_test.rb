@@ -221,4 +221,13 @@ class CardTest < Test::Unit::TestCase
     assert ! c1.equal?(c2)
     assert c1.eql? c2
   end
+
+  def test_get
+    c1 = Card.get 10, :hearts
+    c2 = Card.get 10, :clubs
+    c3 = Card.get 10, :clubs
+
+    assert !c1.equal?(c2)
+    assert c2.equal?(c3)
+  end
 end

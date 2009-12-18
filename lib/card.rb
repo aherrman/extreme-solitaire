@@ -1,11 +1,27 @@
+require 'simple_flywheel'
+
+# A single playing card.
+#
+# This class extends the SimpleFlywheel module to allow for caching each card
+# instance.  See SimpleFlywheel#get for usage.
 class Card
   include Comparable
+
+  extend SimpleFlywheel
+
+# ------------------------------------------------------------------------------
+# :section: Properties
+# ------------------------------------------------------------------------------
 
   # The card's face value as a number <tt>(1 - 13)</tt>
   attr_reader :value
 
   # The card's suit.  See +VALID_SUITS+ for the list of accepted suits.
   attr_reader :suit
+
+# ------------------------------------------------------------------------------
+# :section: Constants
+# ------------------------------------------------------------------------------
 
   # Card value that represents an Ace
   ACE=1
@@ -25,15 +41,27 @@ class Card
   # The valid card values
   VALID_VALUES = (1..13).to_a
 
+# ------------------------------------------------------------------------------
+# :section: Construction
+# ------------------------------------------------------------------------------
+
   # Constructs a Card.  card value and suit are validated and an exception will
   # be thrown if either are invalid.
   # See +VALID_SUITS+ and +VALID_VALUES+ for the valid values
+  #
+  # Generally you should use Card.get instead of Card.new
   def initialize(card_value, card_suit)
     fail "Invalid suit: #{card_suit}" unless validate_suit(card_suit)
     fail "Invalid value: #{card_value}" unless validate_value(card_value)
     @value = card_value
     @suit = card_suit
   end
+
+# ------------------------------------------------------------------------------
+# :section: Object overrides
+# The following methods are overrides for built-in Object methods.  These
+# overrides are to allow for proper equality checking, duplication, etc.
+# ------------------------------------------------------------------------------
 
   # Duplicates the Card
   def dup
@@ -76,6 +104,10 @@ class Card
   def <=>(other)
     @value <=> other.value
   end
+
+# ------------------------------------------------------------------------------
+# :section: Protected methods
+# ------------------------------------------------------------------------------
 
 protected
   # Validates a suit.
