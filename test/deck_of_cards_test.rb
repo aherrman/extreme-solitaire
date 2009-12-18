@@ -8,15 +8,15 @@ require 'enum_helpers'
 
 class DeckOfCardsTest < Test::Unit::TestCase
   def test_size
-    d = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades)]
+    d = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades)]
 
     assert_equal 2, d.size
   end
 
   def test_card
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     d = DeckOfCards.new [c1, c2, c3]
 
@@ -26,9 +26,9 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_index_array_style_access
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     d = DeckOfCards.new [c1, c2, c3]
     
@@ -37,12 +37,32 @@ class DeckOfCardsTest < Test::Unit::TestCase
     assert_equal c, c2
   end
 
+  def test_top
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    d = DeckOfCards.new [c1, c2, c3]
+
+    assert_equal c1, d.top
+  end
+
+  def test_bottom
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    d = DeckOfCards.new [c1, c2, c3]
+
+    assert_equal c3, d.bottom
+  end
+
   def test_start_len_array_style_access
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
 
@@ -53,11 +73,11 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_range_array_style_access
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
 
@@ -67,29 +87,29 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_cannot_modify_using_array_syntax
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
 
     assert_raise(NoMethodError) {
-      d1[2] = Card.new(2, :hearts)
+      d1[2] = Card.get(2, :hearts)
     }
   end
 
   def test_modifying_arg_array_doesnt_change_deck
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     a = [c1, c2, c3]
 
     d = DeckOfCards.new a
 
-    a[1] = Card.new 5, :diamonds
+    a[1] = Card.get 5, :diamonds
 
     assert_equal c1, d.card(0)
     assert_equal c2, d.card(1)
@@ -97,25 +117,26 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_is_standard_deck_when_standard
-    d = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades)]
+    d = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades)]
 
     assert d.is_standard_deck?
   end
 
   def test_is_standard_deck_when_not_standard
-    d = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
-        Card.new(1, :hearts)]
+    d = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
+        Card.get(1, :hearts)]
 
     assert !d.is_standard_deck?
   end
 
   def test_dup
-    d1 = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
-        Card.new(1, :hearts)]
+    d1 = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
+        Card.get(1, :hearts)]
     d2 = d1.dup
 
     assert !d1.equal?(d2)
     assert d1.eql?(d2)
+    assert d1.is_a?(DeckOfCards)
   end
 
   def test_changing_dup_doesnt_change_original
@@ -130,8 +151,8 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_shuffle_bang_modifies_self
-    d1 = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
-        Card.new(1, :hearts)]
+    d1 = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
+        Card.get(1, :hearts)]
     d2 = d1.dup
 
     # shuffle is random, so we might not get a different order.
@@ -149,9 +170,9 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_shuffle_returns_new_deck
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     d1 = DeckOfCards.new [c1, c2, c3]
 
@@ -161,9 +182,9 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_shuffled_deck_has_same_size
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     d1 = DeckOfCards.new [c1, c2, c3]
 
@@ -173,9 +194,9 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_shuffled_deck_has_same_cards
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     d1 = DeckOfCards.new [c1, c2, c3]
 
@@ -185,9 +206,9 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_shuffled_deck_changes_order
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
     d1 = DeckOfCards.new [c1, c2, c3]
 
@@ -206,20 +227,20 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_equality_using_eql
-    d1 = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
-        Card.new(1, :hearts)]
-    d2 = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
-        Card.new(1, :hearts)]
+    d1 = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
+        Card.get(1, :hearts)]
+    d2 = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
+        Card.get(1, :hearts)]
 
     assert d1.eql? d2
     assert d2.eql? d1
   end
 
   def test_inequality_using_eql
-    d1 = DeckOfCards.new [Card.new(1, :hearts), Card.new(2, :spades),
-        Card.new(1, :hearts)]
-    d2 = DeckOfCards.new [Card.new(1, :clubs), Card.new(2, :spades),
-        Card.new(1, :hearts)]
+    d1 = DeckOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
+        Card.get(1, :hearts)]
+    d2 = DeckOfCards.new [Card.get(1, :clubs), Card.get(2, :spades),
+        Card.get(1, :hearts)]
 
     assert !(d1.eql? d2)
     assert !(d2.eql? d1)
@@ -250,11 +271,11 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_pop_cards
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
     d2, popped = d1.pop_cards(2)
@@ -273,11 +294,11 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_push_cards
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3]
     d2 = d1.push_cards(c4, c5)
@@ -294,11 +315,11 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_append_deck
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3]
     d2 = DeckOfCards.new [c4, c5]
@@ -323,11 +344,11 @@ class DeckOfCardsTest < Test::Unit::TestCase
   end
 
   def test_remove_deck
-    c1 = Card.new(1, :hearts)
-    c2 = Card.new(10, :spades)
-    c3 = Card.new(3, :clubs)
-    c4 = Card.new(5, :diamonds)
-    c5 = Card.new(7, :diamonds)
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+    c4 = Card.get(5, :diamonds)
+    c5 = Card.get(7, :diamonds)
 
     d1 = DeckOfCards.new [c1, c2, c3, c4, c5]
     d2, popped = d1.remove_deck(2)
@@ -348,58 +369,58 @@ class DeckOfCardsTest < Test::Unit::TestCase
 
   def default_deck_cards_array
     [
-      Card.new(1, :hearts),
-      Card.new(2, :hearts),
-      Card.new(3, :hearts),
-      Card.new(4, :hearts),
-      Card.new(5, :hearts),
-      Card.new(6, :hearts),
-      Card.new(7, :hearts),
-      Card.new(8, :hearts),
-      Card.new(9, :hearts),
-      Card.new(10, :hearts),
-      Card.new(11, :hearts),
-      Card.new(12, :hearts),
-      Card.new(13, :hearts),
-      Card.new(1, :spades),
-      Card.new(2, :spades),
-      Card.new(3, :spades),
-      Card.new(4, :spades),
-      Card.new(5, :spades),
-      Card.new(6, :spades),
-      Card.new(7, :spades),
-      Card.new(8, :spades),
-      Card.new(9, :spades),
-      Card.new(10, :spades),
-      Card.new(11, :spades),
-      Card.new(12, :spades),
-      Card.new(13, :spades),
-      Card.new(1, :clubs),
-      Card.new(2, :clubs),
-      Card.new(3, :clubs),
-      Card.new(4, :clubs),
-      Card.new(5, :clubs),
-      Card.new(6, :clubs),
-      Card.new(7, :clubs),
-      Card.new(8, :clubs),
-      Card.new(9, :clubs),
-      Card.new(10, :clubs),
-      Card.new(11, :clubs),
-      Card.new(12, :clubs),
-      Card.new(13, :clubs),
-      Card.new(1, :diamonds),
-      Card.new(2, :diamonds),
-      Card.new(3, :diamonds),
-      Card.new(4, :diamonds),
-      Card.new(5, :diamonds),
-      Card.new(6, :diamonds),
-      Card.new(7, :diamonds),
-      Card.new(8, :diamonds),
-      Card.new(9, :diamonds),
-      Card.new(10, :diamonds),
-      Card.new(11, :diamonds),
-      Card.new(12, :diamonds),
-      Card.new(13, :diamonds)
+      Card.get(1, :hearts),
+      Card.get(2, :hearts),
+      Card.get(3, :hearts),
+      Card.get(4, :hearts),
+      Card.get(5, :hearts),
+      Card.get(6, :hearts),
+      Card.get(7, :hearts),
+      Card.get(8, :hearts),
+      Card.get(9, :hearts),
+      Card.get(10, :hearts),
+      Card.get(11, :hearts),
+      Card.get(12, :hearts),
+      Card.get(13, :hearts),
+      Card.get(1, :spades),
+      Card.get(2, :spades),
+      Card.get(3, :spades),
+      Card.get(4, :spades),
+      Card.get(5, :spades),
+      Card.get(6, :spades),
+      Card.get(7, :spades),
+      Card.get(8, :spades),
+      Card.get(9, :spades),
+      Card.get(10, :spades),
+      Card.get(11, :spades),
+      Card.get(12, :spades),
+      Card.get(13, :spades),
+      Card.get(1, :clubs),
+      Card.get(2, :clubs),
+      Card.get(3, :clubs),
+      Card.get(4, :clubs),
+      Card.get(5, :clubs),
+      Card.get(6, :clubs),
+      Card.get(7, :clubs),
+      Card.get(8, :clubs),
+      Card.get(9, :clubs),
+      Card.get(10, :clubs),
+      Card.get(11, :clubs),
+      Card.get(12, :clubs),
+      Card.get(13, :clubs),
+      Card.get(1, :diamonds),
+      Card.get(2, :diamonds),
+      Card.get(3, :diamonds),
+      Card.get(4, :diamonds),
+      Card.get(5, :diamonds),
+      Card.get(6, :diamonds),
+      Card.get(7, :diamonds),
+      Card.get(8, :diamonds),
+      Card.get(9, :diamonds),
+      Card.get(10, :diamonds),
+      Card.get(11, :diamonds),
+      Card.get(12, :diamonds),
+      Card.get(13, :diamonds)
     ]
   end
 end

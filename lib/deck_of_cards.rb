@@ -41,7 +41,7 @@ class DeckOfCards
 
   # Gets the card at a given index
   def card(i)
-    @cards[i]
+    self[i]
   end
 
   # :call-seq:
@@ -53,6 +53,16 @@ class DeckOfCards
   # This works just like Array's [] operator
   def [](*args)
     @cards[*args]
+  end
+
+  # The top (first) card in the deck
+  def top
+    self[0]
+  end
+
+  # The bottom (last) card in the deck
+  def bottom
+    self[-1]
   end
 
   # The size of the deck
@@ -172,7 +182,9 @@ class DeckOfCards
 
   # Duplicates the deck
   def dup
-    DeckOfCards.new @cards
+    # use self.class so that child classes don't have to override this just to
+    # preserve the type
+    self.class.new @cards
   end
 
 # ------------------------------------------------------------------------------
@@ -231,7 +243,7 @@ protected
 
   # Appends the cards from the passed deck to the end of this deck.
   def append_deck!(d)
-    @cards.send("push", *(d.cards))
+    @cards.push(*(d.cards))
   end
 
   # Pops cards from the end of the deck and returns them as a new deck
