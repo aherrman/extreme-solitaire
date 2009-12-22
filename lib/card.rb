@@ -1,13 +1,13 @@
-require 'simple_flywheel'
+require 'simple_flyweight'
 
 # A single playing card.
 #
-# This class extends the SimpleFlywheel module to allow for caching each card
-# instance.  See SimpleFlywheel#get for usage.
+# This class extends the SimpleFlyweight module to allow for caching each card
+# instance.  See SimpleFlyweight#get for usage.
 class Card
   include Comparable
 
-  extend SimpleFlywheel
+  extend SimpleFlyweight
 
 # ------------------------------------------------------------------------------
 # :section: Properties
