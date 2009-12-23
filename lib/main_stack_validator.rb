@@ -11,6 +11,7 @@ class MainStackValidator
   end
 
   def is_valid_stack?(stack)
+    return true if stack.size == 0
     return false if stack[0].value == Card::ACE
 
     prev = nil
@@ -41,6 +42,9 @@ class MainStackValidator
 
 protected
   def is_valid_transition?(top, bottom)
+    if top.nil?
+      return (bottom.nil? || (bottom.value != Card::ACE))
+    end
     return false if top.value == Card::ACE
     return false if bottom.value == Card::ACE
     are_cards_sequential?(top, bottom)

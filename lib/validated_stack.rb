@@ -8,6 +8,8 @@ require "stack_of_cards.rb"
 # * can_append?(top_stack, bottom_stack)
 # * can_append_card?(stack, card)
 # * is_valid_stack?(stack)
+#
+# See AnythingGoesStackValidator for a (dead-simple) example.
 class ValidatedStack < StackOfCards
   # The validator used to validate this stack
   attr_reader :validator
