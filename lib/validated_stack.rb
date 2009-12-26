@@ -19,6 +19,8 @@ class ValidatedStack < StackOfCards
 
   # Initializes the stack to use the given validator.
   # This will raise an error if validator is nil
+  #
+  # The cards variable can be either an array of cards or a stack
   def initialize(cards, validator, can_shuffle=false)
     super(cards)
     raise "No validator provided" if validator.nil?

@@ -31,9 +31,9 @@ class StackOfCardsTest < Test::Unit::TestCase
     c3 = Card.get(3, :clubs)
 
     d = StackOfCards.new [c1, c2, c3]
-    
+
     c = d[1]
-    
+
     assert_equal c, c2
   end
 
@@ -116,18 +116,46 @@ class StackOfCardsTest < Test::Unit::TestCase
     assert_equal c3, d.card(2)
   end
 
-  #def test_is_standard_stack_when_standard
-  #  d = StackOfCards.new [Card.get(1, :hearts), Card.get(2, :spades)]
+  def test_can_create_from_another_stack
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
 
-  #  assert d.is_standard_stack?
-  #end
+    s = StackOfCards.new [c1, c2, c3]
 
-  #def test_is_standard_stack_when_not_standard
-  #  d = StackOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),
-  #      Card.get(1, :hearts)]
+    d = StackOfCards.new s
 
-  #  assert !d.is_standard_stack?
-  #end
+    assert_equal c1, d.card(0)
+    assert_equal c2, d.card(1)
+    assert_equal c3, d.card(2)
+  end
+
+  def test_to_a_returns_new_array
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    s = StackOfCards.new [c1, c2, c3]
+
+    a1 = s.to_a
+    a2 = s.to_a
+
+    assert ! a1.equal?(a2)
+  end
+
+  def test_changing_to_a_return_doesnt_change_stack
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    s = StackOfCards.new [c1, c2, c3]
+
+    a1 = s.to_a
+
+    a1[0] = Card.get(5, :diamonds)
+
+    assert_equal c1, s[0]
+  end
 
   def test_dup
     d1 = StackOfCards.new [Card.get(1, :hearts), Card.get(2, :spades),

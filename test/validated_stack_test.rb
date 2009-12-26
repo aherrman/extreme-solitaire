@@ -24,6 +24,25 @@ class MainStackValidatorTest < Test::Unit::TestCase
     }
   end
 
+  def test_can_create_validated_stack_from_valid_stack
+    c1 = Card.new(10, :hearts)
+    c2 = Card.new(9, :clubs)
+    s = StackOfCards.new [c1, c2]
+
+    vs = ValidatedStack.new s, @v
+  end
+
+  def test_cannot_create_validated_stack_from_invalid_stack
+    c1 = Card.new(10, :hearts)
+    c2 = Card.new(9, :hearts)
+
+    s = StackOfCards.new [c1, c2]
+
+    assert_raise(RuntimeError) {
+      ValidatedStack.new s, @v
+    }
+  end
+
   def test_can_append_when_valid
     c1 = Card.new(10, :hearts)
     c2 = Card.new(9, :clubs)

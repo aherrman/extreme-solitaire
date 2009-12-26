@@ -11,7 +11,11 @@ class StackOfCards
   # Creates a StackOfCards.  The cards argument is an array of the Card objects
   # that make up the stack.
   def initialize(cards)
-    @cards = cards.dup
+    if cards.is_a?(Array)
+      @cards = cards.dup
+    else
+      @cards = cards.to_a
+    end
   end
 
   # Creates a StackOfCards containing a default stack.
@@ -104,6 +108,11 @@ class StackOfCards
   #   new_stack, card = s.remove_card
   def remove_card
     modify_dup(:remove_card!)
+  end
+
+  # Returns the stack as an array of cards
+  def to_a
+    @cards.dup
   end
 
 # ------------------------------------------------------------------------------
