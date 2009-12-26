@@ -274,29 +274,21 @@ class StackOfCardsTest < Test::Unit::TestCase
     assert !(d2.eql? d1)
   end
 
-  #def test_default_stack
-  #  d = StackOfCards.default_stack
-  #  assert d.is_full_stack?
-  #end
+  def test_default_stack
+    d = StackOfCards.default_stack
+    real_default = StackOfCards.new default_stack_cards_array
 
-  #def test_shuffled_stack
-  #  d = StackOfCards.default_stack
-  #  s = StackOfCards.shuffled_stack
-  #  assert s.is_full_stack?
-  #  assert d != s
-  #end
+    assert_equal real_default, d
+  end
 
-  #def test_full_stack_when_full
-  #  d = StackOfCards.new default_stack_cards_array
-  #  assert d.is_full_stack?
-  #end
+  def test_shuffled_stack
+    d = StackOfCards.default_stack
+    s = StackOfCards.shuffled_stack
 
-  #def test_full_stack_when_not_full
-  #  cards = default_stack_cards_array
-  #  cards.pop(2)
-  #  d = StackOfCards.new cards
-  #  assert !(d.is_full_stack?)
-  #end
+    assert_not_equal d, s
+    assert_equal 0, s.count{|c| !d.include?(c)}
+    assert_equal d.size, s.size
+  end
 
   def test_append_card
     c1 = Card.get(1, :hearts)
