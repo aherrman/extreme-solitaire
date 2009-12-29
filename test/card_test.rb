@@ -6,6 +6,7 @@ require 'test/unit'
 require 'card'
 
 class CardTest < Test::Unit::TestCase
+  #spec
   def test_valid_cards_dont_throw_exceptions
     Card::VALID_SUITS.each { |suit|
       Card::VALID_VALUES.each { |val|
@@ -14,12 +15,14 @@ class CardTest < Test::Unit::TestCase
     }
   end
 
+  #spec
   def test_invalid_value_throws_exceptions
     assert_raise(RuntimeError) {
       c = Card.new 15, :hearts
     }
   end
 
+  #spec
   def test_invalid_suit_throws_exceptions
     assert_raise(RuntimeError) {
       c = Card.new 10, :foo
