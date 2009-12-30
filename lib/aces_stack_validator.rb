@@ -18,6 +18,7 @@ class AcesStackValidator
   end
 
   def is_valid_stack?(stack)
+    return true if stack.size == 0
     return false unless stack[0].suit == @suit
 
     prev = nil

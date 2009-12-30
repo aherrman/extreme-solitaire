@@ -34,6 +34,26 @@ class AcesStackValidatorTest < Test::Unit::TestCase
     assert ! @v.is_valid_stack?(invalid_stack)
   end
 
+  def test_empty_stack_is_valid
+    empty = StackOfCards.new []
+
+    assert @v.is_valid_stack?(empty)
+  end
+
+  def test_can_append_ace_to_empty_stack
+    empty = StackOfCards.new []
+    ace = Card.get 1, :diamonds
+
+    assert @v.can_append_card?(empty, ace)
+  end
+
+  def test_cannot_append_non_ace_to_empty_stack
+    empty = StackOfCards.new []
+    ace = Card.get 2, :diamonds
+
+    assert ! @v.can_append_card?(empty, ace)
+  end
+
   def test_is_valid_returns_true_if_valid
     c1 = Card.new(1, :diamonds)
     c2 = Card.new(2, :diamonds)
