@@ -73,6 +73,11 @@ class StackOfCards
     @cards.size
   end
 
+  # Whether or not the stack is empty
+  def empty?
+    @cards.empty?
+  end
+
   # Creates a shuffled copy of the stack.  This is just like shuffle! but returns
   # a new stack instead of changing the stack it was called on.
   def shuffle(count=1)

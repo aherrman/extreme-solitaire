@@ -13,6 +13,18 @@ class StackOfCardsTest < Test::Unit::TestCase
     assert_equal 2, d.size
   end
 
+  def test_empty_when_empty
+    d = StackOfCards.new []
+
+    assert d.empty?
+  end
+
+  def test_empty_when_not_empty
+    d = StackOfCards.new [Card.get(1, :hearts)]
+
+    assert ! d.empty?
+  end
+
   def test_card
     c1 = Card.get(1, :hearts)
     c2 = Card.get(10, :spades)
