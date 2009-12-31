@@ -1,11 +1,11 @@
 require 'stack_of_cards'
-require 'main_stack_validator'
+require 'tableau_validator'
 require 'validated_stack'
 
-# Represents one of the columns on the solitaire board.
+# Represents one of the columns (tableaus) on the solitaire board.
 # This adds a stack of hidden cards along with the normal stack, and removes
 # the top card from the hidden card when the validated stack is emptied.
-class SolitaireColumn < ValidatedStack
+class Tableau < ValidatedStack
 
   # Initializes the column from the set of cards.  The bottom card is made
   # visible, and the rest are set as the hidden cards
@@ -21,7 +21,7 @@ class SolitaireColumn < ValidatedStack
     end
 
     @hidden_cards = StackOfCards.new hidden
-    super(visible, MainStackValidator.get)
+    super(visible, TableauStackValidator.get)
   end
 
   # The number of hidden cards left
@@ -56,7 +56,7 @@ class SolitaireColumn < ValidatedStack
 
   # Creates a duplicate of this stack
   def dup
-    d = SolitaireColumn.new []
+    d = Tableau.new []
     d.set_data(@hidden_cards, @cards)
     d
   end

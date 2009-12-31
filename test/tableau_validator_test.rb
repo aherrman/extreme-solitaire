@@ -2,17 +2,17 @@ $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
 require 'test/unit'
 require 'stack_of_cards'
-require 'main_stack_validator'
+require 'tableau_validator'
 
-class MainStackValidatorTest < Test::Unit::TestCase
+class TableauStackValidatorTest < Test::Unit::TestCase
 
   def setup
-    @v = MainStackValidator.get
+    @v = TableauStackValidator.get
   end
 
   def test_get_returns_same_instance_every_time
-    v1 = MainStackValidator.get
-    v2 = MainStackValidator.get
+    v1 = TableauStackValidator.get
+    v2 = TableauStackValidator.get
 
     assert_equal v1, v2
     assert v1.equal?(v2)

@@ -1,8 +1,8 @@
 require "card.rb"
 require "simple_flyweight.rb"
 
-#Validator for the Aces stacks
-class AcesStackValidator
+#Validator for the Aces stacks (foundations)
+class FoundationValidator
   # Extend flyweight so that we only have to construct one validator per type.
   extend SimpleFlyweight
 
@@ -10,7 +10,7 @@ class AcesStackValidator
   attr_reader :suit
 
   # Initializes the validator for the given suit.  Generally you should use
-  # AcesStackValidator.get instead of constructing new instances.
+  # FoundationValidator.get instead of constructing new instances.
   def initialize(suit)
     raise "Suit cannot be nil" if suit.nil?
     raise "Unknown suit" unless Card::VALID_SUITS.include?(suit)

@@ -1,13 +1,13 @@
 require "card.rb"
 
-# Validator for the main stacks used in the solitaire board
-class MainStackValidator
-  # Gets the default instance of MainStackValidator.  Generally you should use
-  # this to get a MainStackValidator so to save memory and allow equality
+# Validator for the main stacks (tableaus) used in the solitaire board
+class TableauStackValidator
+  # Gets the default instance of TableauStackValidator.  Generally you should
+  # use this to get a TableauStackValidator so to save memory and allow equality
   # checks to work.
   def self.get
     return @default_instance unless @default_instance.nil?
-    @default_instance = MainStackValidator.new
+    @default_instance = TableauStackValidator.new
   end
 
   def is_valid_stack?(stack)

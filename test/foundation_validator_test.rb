@@ -2,17 +2,17 @@ $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
 require 'test/unit'
 require 'stack_of_cards'
-require 'aces_stack_validator'
+require 'foundation_validator'
 
-class AcesStackValidatorTest < Test::Unit::TestCase
+class FoundationValidatorTest < Test::Unit::TestCase
 
   def setup
-    @v = AcesStackValidator.get :diamonds
+    @v = FoundationValidator.get :diamonds
   end
 
   def test_get_returns_same_instance_every_time
-    v1 = AcesStackValidator.get :spades
-    v2 = AcesStackValidator.get :spades
+    v1 = FoundationValidator.get :spades
+    v2 = FoundationValidator.get :spades
 
     assert_equal v1, v2
     assert v1.equal?(v2)

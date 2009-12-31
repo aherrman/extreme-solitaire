@@ -2,12 +2,12 @@ $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
 require 'test/unit'
 require 'validated_stack'
-require 'main_stack_validator'
+require 'tableau_validator'
 
-class MainStackValidatorTest < Test::Unit::TestCase
+class ValidatedStackTest < Test::Unit::TestCase
 
   def setup
-    @v = MainStackValidator.new
+    @v = TableauStackValidator.new
   end
 
   def test_valid_stack_can_be_constructed
@@ -217,7 +217,7 @@ class MainStackValidatorTest < Test::Unit::TestCase
     c2 = Card.new(9, :clubs)
     c3 = Card.new(8, :diamonds)
     s1 = ValidatedStack.new [c1, c2], @v
-    s2 = ValidatedStack.new [c1, c2, c3], MainStackValidator.new
+    s2 = ValidatedStack.new [c1, c2, c3], TableauStackValidator.new
 
     assert_not_equal s1, s2
   end
@@ -226,7 +226,7 @@ class MainStackValidatorTest < Test::Unit::TestCase
     c1 = Card.new(10, :hearts)
     c2 = Card.new(9, :clubs)
     s1 = ValidatedStack.new [c1, c2], @v
-    s2 = ValidatedStack.new [c1, c2], MainStackValidator.new
+    s2 = ValidatedStack.new [c1, c2], TableauStackValidator.new
 
     assert_not_equal s1, s2
   end

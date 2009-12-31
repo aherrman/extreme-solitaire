@@ -1,15 +1,15 @@
 $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
 require 'test/unit'
-require 'solitaire_column'
+require 'tableau'
 
-class SolitaireColumnTest < Test::Unit::TestCase
+class TableauTest < Test::Unit::TestCase
   def test_bottom_card_in_init_array_is_only_visible_card
     c1 = Card.get 10, :hearts
     c2 = Card.get 4, :hearts
     c3 = Card.get 7, :clubs
 
-    column = SolitaireColumn.new [c1, c2, c3]
+    column = Tableau.new [c1, c2, c3]
 
     assert_equal 1, column.size
     assert_equal c3, column[0]
@@ -20,7 +20,7 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c2 = Card.get 4, :hearts
     c3 = Card.get 7, :clubs
 
-    column = SolitaireColumn.new [c1, c2, c3]
+    column = Tableau.new [c1, c2, c3]
 
     assert_equal 2, column.num_hidden
   end
@@ -30,7 +30,7 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c2 = Card.get 4, :hearts
     c3 = Card.get 7, :clubs
 
-    column = SolitaireColumn.new [c1, c2, c3]
+    column = Tableau.new [c1, c2, c3]
     new_column, card = column.remove_card
 
     assert_equal 1, new_column.size
@@ -42,7 +42,7 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c2 = Card.get 4, :hearts
     c3 = Card.get 7, :clubs
 
-    column = SolitaireColumn.new [c1, c2, c3]
+    column = Tableau.new [c1, c2, c3]
     new_column, stack = column.remove_stack(1)
 
     assert_equal 1, new_column.size
@@ -50,7 +50,7 @@ class SolitaireColumnTest < Test::Unit::TestCase
   end
 
   def test_can_append_king_when_empty
-    column = SolitaireColumn.new []
+    column = Tableau.new []
 
     assert column.can_append_card?(Card.get(Card::KING, :clubs))
   end
@@ -59,14 +59,14 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c1 = Card.get(Card::KING, :clubs)
     c2 = Card.get(Card::QUEEN, :diamonds)
 
-    column = SolitaireColumn.new []
+    column = Tableau.new []
     king_stack = StackOfCards.new [c1, c2]
 
     assert column.can_append?(king_stack)
   end
 
   def test_cannot_append_non_king_when_empty
-    column = SolitaireColumn.new []
+    column = Tableau.new []
 
     assert ! column.can_append_card?(Card.get(9, :clubs))
   end
@@ -75,7 +75,7 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c1 = Card.get(9, :clubs)
     c2 = Card.get(8, :diamonds)
 
-    column = SolitaireColumn.new []
+    column = Tableau.new []
     non_king_stack = StackOfCards.new [c1, c2]
 
     assert ! column.can_append?(non_king_stack)
@@ -86,8 +86,8 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c2 = Card.get 4, :hearts
     c3 = Card.get 7, :clubs
 
-    column1 = SolitaireColumn.new [c1, c2, c3]
-    column2 = SolitaireColumn.new [c1, c2, c3]
+    column1 = Tableau.new [c1, c2, c3]
+    column2 = Tableau.new [c1, c2, c3]
 
     assert_equal column1, column2
   end
@@ -97,8 +97,8 @@ class SolitaireColumnTest < Test::Unit::TestCase
     c2 = Card.get 4, :hearts
     c3 = Card.get 7, :clubs
 
-    column1 = SolitaireColumn.new [c1, c2, c3]
-    column2 = SolitaireColumn.new [c2, c1, c3]
+    column1 = Tableau.new [c1, c2, c3]
+    column2 = Tableau.new [c2, c1, c3]
 
     assert_not_equal column1, column2
   end
