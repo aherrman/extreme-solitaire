@@ -80,4 +80,26 @@ class SolitaireColumnTest < Test::Unit::TestCase
 
     assert ! column.can_append?(non_king_stack)
   end
+
+  def test_equal_when_hidden_cards_are_equal
+    c1 = Card.get 10, :hearts
+    c2 = Card.get 4, :hearts
+    c3 = Card.get 7, :clubs
+
+    column1 = SolitaireColumn.new [c1, c2, c3]
+    column2 = SolitaireColumn.new [c1, c2, c3]
+
+    assert_equal column1, column2
+  end
+
+  def test_not_equal_when_hidden_cards_are_not_equal
+    c1 = Card.get 10, :hearts
+    c2 = Card.get 4, :hearts
+    c3 = Card.get 7, :clubs
+
+    column1 = SolitaireColumn.new [c1, c2, c3]
+    column2 = SolitaireColumn.new [c2, c1, c3]
+
+    assert_not_equal column1, column2
+  end
 end
