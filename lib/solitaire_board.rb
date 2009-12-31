@@ -46,15 +46,15 @@ class SolitaireBoard
   #
   # The following properties can be added to the state hash for initialization:
   #
-  # * :diamonds_foundation - The diamonds foundation (aces stack)
-  # * :hearts_foundation - The hearts foundation (aces stack)
-  # * :clubs_foundation - The clubs foundation (aces stack)
-  # * :spades_foundation - The spades foundation (aces stack)
-  # * :tableaus - Array of all the tableaus (columns).  Only the first 7
-  #               entries in the array will be used.
-  # * :unused_waste - The unused waste pile (stack of cards)
-  # * :used_waste - The used waste pile (stack of cards)
-  # * :turn_count - The number of turns that have happened so far
+  # [:diamonds_foundation] The diamonds foundation (aces stack)
+  # [:hearts_foundation] The hearts foundation (aces stack)
+  # [:clubs_foundation] The clubs foundation (aces stack)
+  # [:spades_foundation] The spades foundation (aces stack)
+  # [:tableaus] Array of all the tableaus (columns).
+  #             Only the first 7 entries in the array will be used.
+  # [:unused_waste] The unused waste pile (stack of cards)
+  # [:used_waste] The used waste pile (stack of cards)
+  # [:turn_count] The number of turns that have happened so far
   def initialize(state)
     @diamonds_foundation = get_state(state, :diamonds_foundation) {
       create_foundation(:diamonds)
