@@ -1,20 +1,10 @@
 require 'validated_foundation'
 require 'aces_foundation_validator'
 require 'tableau'
+require 'immutable_proxy'
 
 # The solitaire board
 class SolitaireBoard
-  # The diamonds foundation (aces stack)
-  attr_reader :diamonds_foundation
-
-  # The hearts foundation (aces stack)
-  attr_reader :hearts_foundation
-
-  # The clubs foundation (aces stack)
-  attr_reader :clubs_foundation
-
-  # The spades foundation (aces stack)
-  attr_reader :spades_foundation
 
   # The number of turns that have been made so far
   attr_reader :turn_count
@@ -89,9 +79,11 @@ class SolitaireBoard
     @turn_count = get_state(state, :turn_count) { 0 }
   end
 
-  # Gets one of the columns (tableaus) by index.
+  # Gets one of the columns (tableaus) by index.  Returned tableau is immutable
   def get_tableau(i)
-    @tableaus[i]
+    tableau = @tableaus[i]
+    return nil if tableau.nil?
+    ImmutableProxy.new tableau
   end
 
   # The card at the top of the used waste pile
@@ -109,6 +101,26 @@ class SolitaireBoard
   # The number of cards in the used waste pile
   def num_used_waste_cards
     @used_waste_pile.size
+  end
+
+  # The diamonds foundation (aces stack).  Returned stack is immutable
+  def diamonds_foundation
+    ImmutableProxy.new @diamonds_foundation
+  end
+
+  # The hearts foundation (aces stack).  Returned stack is immutable
+  def hearts_foundation
+    ImmutableProxy.new @hearts_foundation
+  end
+
+  # The clubs foundation (aces stack).  Returned stack is immutable
+  def clubs_foundation
+    ImmutableProxy.new @clubs_foundation
+  end
+
+  # The spades foundation (aces stack).  Returned stack is immutable
+  def spades_foundation
+    ImmutableProxy.new @spades_foundation
   end
 
 private

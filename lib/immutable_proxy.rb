@@ -17,6 +17,6 @@ class ImmutableProxy
 
 private
   def allowed?(name)
-    ! name.to_s.end_with?('!')
+    ! name.to_s.end_with?('!') || !@target.respond_to?(name)
   end
 end

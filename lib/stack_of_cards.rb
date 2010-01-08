@@ -137,6 +137,26 @@ class StackOfCards
     end
   end
 
+  # Appends the cards from the passed stack to the end of this stack.
+  def append_stack!(d)
+    @cards.push(*(d.cards))
+  end
+
+  # Pushes a single card onto the stack
+  def append_card!(c)
+    @cards.push(c)
+  end
+
+  # Removes a single card from the end of the stack
+  def remove_card!
+    @cards.pop
+  end
+
+  # Pops cards from the end of the stack and returns them as a new stack
+  def remove_stack!(n=1)
+    StackOfCards.new @cards.pop(n)
+  end
+
 # ------------------------------------------------------------------------------
 # :section: Enumerable support
 # ------------------------------------------------------------------------------
@@ -196,25 +216,5 @@ protected
     d = self.dup
     result = d.send(method, *args)
     [d, result]
-  end
-
-  # Appends the cards from the passed stack to the end of this stack.
-  def append_stack!(d)
-    @cards.push(*(d.cards))
-  end
-
-  # Pushes a single card onto the stack
-  def append_card!(c)
-    @cards.push(c)
-  end
-
-  # Removes a single card from the end of the stack
-  def remove_card!
-    @cards.pop
-  end
-
-  # Pops cards from the end of the stack and returns them as a new stack
-  def remove_stack!(n=1)
-    StackOfCards.new @cards.pop(n)
   end
 end

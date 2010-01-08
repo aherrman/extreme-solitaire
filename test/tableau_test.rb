@@ -25,6 +25,23 @@ class TableauTest < Test::Unit::TestCase
     assert_equal 2, column.num_hidden
   end
 
+  def test_hidden_card_not_used_when_cards_are_left
+    c1 = Card.get 10, :hearts
+    c2 = Card.get 4, :hearts
+    c3 = Card.get 7, :clubs
+    c4 = Card.get 6, :diamonds
+
+    column = Tableau.new [c1, c2, c3]
+    column.append_card!(c4)
+    new_column, card = column.remove_card
+
+    new_column.update_from_hidden_if_empty!
+
+    assert_equal 1, new_column.size
+    assert_equal c3, new_column[0]
+    assert_equal 2, new_column.num_hidden
+  end
+
   def test_hidden_card_used_when_last_card_removed
     c1 = Card.get 10, :hearts
     c2 = Card.get 4, :hearts
@@ -32,6 +49,8 @@ class TableauTest < Test::Unit::TestCase
 
     column = Tableau.new [c1, c2, c3]
     new_column, card = column.remove_card
+
+    new_column.update_from_hidden_if_empty!
 
     assert_equal 1, new_column.size
     assert_equal c2, new_column[0]
@@ -44,6 +63,8 @@ class TableauTest < Test::Unit::TestCase
 
     column = Tableau.new [c1, c2, c3]
     new_column, stack = column.remove_stack(1)
+
+    new_column.update_from_hidden_if_empty!
 
     assert_equal 1, new_column.size
     assert_equal c2, new_column[0]

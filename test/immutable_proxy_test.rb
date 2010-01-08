@@ -43,4 +43,10 @@ class ImmutableProxyTest < Test::Unit::TestCase
   def test_proxy_does_not_respond_to_mutating_method
     assert ! @proxy.respond_to?(:set_value!)
   end
+
+  def test_proxy_throws_no_method_error_on_nonexistant_mutating_function
+    assert_raise(NoMethodError) do
+      @proxy.do_something!
+    end
+  end
 end

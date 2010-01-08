@@ -49,6 +49,16 @@ class Tableau < ValidatedStack
   end
 
 # ------------------------------------------------------------------------------
+# :section: Mutating functions
+# These are the methods that mutate the object
+# ------------------------------------------------------------------------------
+  def update_from_hidden_if_empty!
+    if size == 0 && !@hidden_cards.empty?
+      append_card!(@hidden_cards.remove_card!)
+    end
+  end
+
+# ------------------------------------------------------------------------------
 # :section: Object overrides
 # The following methods are overrides for built-in Object methods.  These
 # overrides are to allow for proper equality checking, duplication, etc.
@@ -84,23 +94,5 @@ protected
   def set_data(hidden_cards, visible_cards)
     @hidden_cards = hidden_cards.dup
     @cards = visible_cards.dup
-  end
-
-  def remove_card!
-    ret = super()
-    update_from_hidden_if_empty
-    ret
-  end
-
-  def remove_stack!(n=1)
-    ret = super(n)
-    update_from_hidden_if_empty
-    ret
-  end
-
-  def update_from_hidden_if_empty
-    if size == 0 && !@hidden_cards.empty?
-      append_card!(@hidden_cards.remove_card!)
-    end
   end
 end
