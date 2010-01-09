@@ -1,5 +1,5 @@
-require 'validated_foundation'
-require 'aces_foundation_validator'
+require 'validated_stack'
+require 'foundation'
 require 'tableau'
 require 'immutable_proxy'
 
@@ -47,23 +47,23 @@ class SolitaireBoard
   # [:turn_count] The number of turns that have happened so far
   def initialize(state)
     @diamonds_foundation = get_state(state, :diamonds_foundation) {
-      create_foundation(:diamonds)
+      Foundation.new [], :diamonds
     }
     @hearts_foundation = get_state(state, :hearts_foundation) {
-      create_foundation(:hearts)
+      Foundation.new [], :hearts
     }
     @clubs_foundation = get_state(state, :clubs_foundation) {
-      create_foundation(:clubs)
+      Foundation.new [], :clubs
     }
     @spades_foundation = get_state(state, :spades_foundation) {
-      create_foundation(:spades)
+      Foundation.new [], :spades
     }
 
     init_tab = get_state(state, :tableaus) { [] }
 
     @tableaus = []
 
-    (1..7).each do |i|
+    (0..6).each do |i|
       @tableaus.push get_state(init_tab, i) {
         Tableau.new []
       }
@@ -124,11 +124,6 @@ class SolitaireBoard
   end
 
 private
-  # Shorthand for creating a foundation for a given suit
-  def create_foundation(suit)
-    ValidatedStack.new [], FoundationValidator.get(suit)
-  end
-
   # Gets a state value from the state hash.  If no value with the given ID is
   # found (returns nil) and a block was provided then the block will be run and
   # its return value used.

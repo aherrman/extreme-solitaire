@@ -15,6 +15,30 @@ class ImmutableProxy
     @target.respond_to?(name, include_private)
   end
 
+  def eql?(o)
+    @target.eql?(o)
+  end
+
+  def ==(o)
+    @target == o
+  end
+
+  def dup
+    ImmutableProxy.new @target
+  end
+
+  def hash
+    @target.hash
+  end
+
+  def class
+    @target.class
+  end
+
+  def is_a?(c)
+    @target.is_a?(c)
+  end
+
 private
   def allowed?(name)
     ! name.to_s.end_with?('!') || !@target.respond_to?(name)

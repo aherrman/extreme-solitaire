@@ -49,4 +49,44 @@ class ImmutableProxyTest < Test::Unit::TestCase
       @proxy.do_something!
     end
   end
+
+  def test_equality
+    p1 = ImmutableProxy.new 10
+    p2 = ImmutableProxy.new 10
+
+    assert_equal p1, p2
+  end
+
+  def test_inequality
+    p1 = ImmutableProxy.new 10
+    p2 = ImmutableProxy.new 11
+
+    assert_not_equal p1, p2
+  end
+
+  def test_hash
+    val = 10
+    proxy = ImmutableProxy.new 10
+
+    assert_equal val.hash, proxy.hash
+  end
+
+  def test_class
+    val = 10
+    proxy = ImmutableProxy.new 10
+
+    assert_equal val.class, proxy.class
+  end
+
+  def test_is_a
+    proxy = ImmutableProxy.new 10
+    assert proxy.is_a?(FixedNum)
+  end
+
+  def test_dup
+    proxy = ImmutableProxy.new 10
+    proxy2 = proxy.dup
+    assert_equal proxy, proxy2
+    assert ! proxy.equal(proxy2)
+  end
 end
