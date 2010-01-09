@@ -5,9 +5,15 @@ class ImmutableProxy
     @target = target
   end
 
-  def method_missing(name, *args, &block)
+  # Use this to call any built-in object methods that are masked by
+  # ImmutableProxy's built-in object methods.
+  def send_to_target(name, *args, &block)
     raise "Mutable methods not allowed" unless allowed?(name)
-    @target.send(name, *args, &block)
+    @target.__send__(name, *args, &block)
+  end
+
+  def method_missing(name, *args, &block)
+    send_to_target(name, *args, &block)
   end
 
   def respond_to?(name, include_private=false)
@@ -31,14 +37,13 @@ class ImmutableProxy
     @target.hash
   end
 
-  def class
-    @target.class
-  end
-
   def is_a?(c)
     @target.is_a?(c)
   end
 
+  def nil?
+    @target.nil?
+  end
 private
   def allowed?(name)
     ! name.to_s.end_with?('!') || !@target.respond_to?(name)

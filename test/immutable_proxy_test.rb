@@ -71,22 +71,25 @@ class ImmutableProxyTest < Test::Unit::TestCase
     assert_equal val.hash, proxy.hash
   end
 
-  def test_class
-    val = 10
-    proxy = ImmutableProxy.new 10
-
-    assert_equal val.class, proxy.class
-  end
-
   def test_is_a
     proxy = ImmutableProxy.new 10
-    assert proxy.is_a?(FixedNum)
+    assert proxy.is_a?(10.class)
   end
 
   def test_dup
     proxy = ImmutableProxy.new 10
     proxy2 = proxy.dup
     assert_equal proxy, proxy2
-    assert ! proxy.equal(proxy2)
+    assert ! proxy.equal?(proxy2)
+  end
+
+  def test_nil
+    proxy = ImmutableProxy.new nil
+    assert proxy.nil?
+  end
+
+  def test_masked_method
+    proxy = ImmutableProxy.new 10
+    assert_equal 10.class, proxy.send_to_target(:class)
   end
 end
