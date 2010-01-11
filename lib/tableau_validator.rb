@@ -12,7 +12,6 @@ class TableauStackValidator
 
   def is_valid_stack?(stack)
     return true if stack.size == 0
-    return false if stack[0].value == Card::ACE
 
     prev = nil
     valid = true
@@ -43,7 +42,7 @@ class TableauStackValidator
 protected
   def is_valid_transition?(top, bottom)
     if top.nil?
-      return (bottom.nil? || (bottom.value != Card::ACE))
+      return (bottom.nil? || (bottom.value == Card::KING))
     end
     return false if top.value == Card::ACE
     return false if bottom.value == Card::ACE

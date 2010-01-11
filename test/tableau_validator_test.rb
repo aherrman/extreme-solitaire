@@ -26,9 +26,17 @@ class TableauStackValidatorTest < Test::Unit::TestCase
     assert ! @v.is_valid_stack?(invalid_stack)
   end
 
-  def test_is_valid_stack_returns_false_if_has_ace
+  def test_is_valid_stack_returns_true_if_just_ace
     c1 = Card.new(1, :hearts)
-    invalid_stack = StackOfCards.new [c1]
+    valid_stack = StackOfCards.new [c1]
+
+    assert @v.is_valid_stack?(valid_stack)
+  end
+
+  def test_is_valid_stack_returns_false_if_has_ace
+    c1 = Card.new(2, :clubs)
+    c2 = Card.new(1, :hearts)
+    invalid_stack = StackOfCards.new [c1, c2]
 
     assert ! @v.is_valid_stack?(invalid_stack)
   end
@@ -41,8 +49,15 @@ class TableauStackValidatorTest < Test::Unit::TestCase
     assert @v.is_valid_stack?(valid_stack)
   end
 
-  def test_can_append_to_empty_stack
+  def test_cannot_append_non_king_to_empty_stack
     c1 = Card.new(2, :hearts)
+    s = StackOfCards.new []
+
+    assert ! @v.can_append_card?(s, c1)
+  end
+
+  def test_can_append_king_to_empty_stack
+    c1 = Card.new(Card::KING, :hearts)
     s = StackOfCards.new []
 
     assert @v.can_append_card?(s, c1)

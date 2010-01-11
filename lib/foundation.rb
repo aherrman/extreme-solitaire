@@ -18,6 +18,6 @@ class Foundation < ValidatedStack
 
   # Creates a duplicate of this stack
   def dup
-    Foundation.new @cards, @validator
+    Foundation.new @cards, @validator.suit
   end
 end

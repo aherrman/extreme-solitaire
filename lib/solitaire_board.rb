@@ -6,8 +6,9 @@ require 'immutable_proxy'
 # The solitaire board
 class SolitaireBoard
 
-  # The number of turns that have been made so far
-  attr_reader :turn_count
+# ------------------------------------------------------------------------------
+# :section: Construction
+# ------------------------------------------------------------------------------
 
   # Builds a board from a deck of cards
   def self.build_from_deck(deck)
@@ -21,10 +22,10 @@ class SolitaireBoard
       tableaus.push Tableau.new stack
     end
 
-    unused_waste_pile = deck
+    unused_waste = deck
 
     state[:tableaus] = tableaus
-    state[:unused_waste] = unused_waste_pile
+    state[:unused_waste] = unused_waste
 
     SolitaireBoard.new state
   end
@@ -45,7 +46,7 @@ class SolitaireBoard
   # [:unused_waste] The unused waste pile (stack of cards)
   # [:used_waste] The used waste pile (stack of cards)
   # [:turn_count] The number of turns that have happened so far
-  def initialize(state)
+  def initialize(state=nil)
     @diamonds_foundation = get_state(state, :diamonds_foundation) {
       Foundation.new [], :diamonds
     }
@@ -69,15 +70,22 @@ class SolitaireBoard
       }
     end
 
-    @unused_waste_pile = get_state(state, :unused_waste) {
+    @unused_waste = get_state(state, :unused_waste) {
       StackOfCards.new []
     }
-    @used_waste_pile = get_state(state, :used_waste) {
+    @used_waste = get_state(state, :used_waste) {
       StackOfCards.new []
     }
 
     @turn_count = get_state(state, :turn_count) { 0 }
   end
+
+# ------------------------------------------------------------------------------
+# :section: Board state accessors
+# ------------------------------------------------------------------------------
+
+  # The number of turns that have been made so far
+  attr_reader :turn_count
 
   # Gets one of the columns (tableaus) by index.  Returned tableau is immutable
   def get_tableau(i)
@@ -90,17 +98,17 @@ class SolitaireBoard
   def top_waste_card
     # The usable waste card is actually the one on the bottom of the used pile,
     # since appends/removes happen at the bottom.
-    @used_waste_pile.bottom
+    @used_waste.bottom
   end
 
   # The number of cards in the unused waste pile
   def num_unused_waste_cards
-    @unused_waste_pile.size
+    @unused_waste.size
   end
 
   # The number of cards in the used waste pile
   def num_used_waste_cards
-    @used_waste_pile.size
+    @used_waste.size
   end
 
   # The diamonds foundation (aces stack).  Returned stack is immutable
@@ -123,12 +131,89 @@ class SolitaireBoard
     ImmutableProxy.new @spades_foundation
   end
 
+# ------------------------------------------------------------------------------
+# :section: Misc Public Methods
+# ------------------------------------------------------------------------------
+
+  # Checks to see if another board is equal to this one in every way except for
+  # the turn count.  Usefulf for seeing if a particular board configuration has
+  # been seen before.
+  def eql_except_for_turn_count?(board)
+    check_equal(board, :@diamonds_foundation) &&
+    check_equal(board, :@clubs_foundation) &&
+    check_equal(board, :@spades_foundation) &&
+    check_equal(board, :@hearts_foundation) &&
+    check_equal(board, :@unused_waste) &&
+    check_equal(board, :@used_waste) &&
+    check_equal(board, :@tableaus)
+  end
+
+# ------------------------------------------------------------------------------
+# :section: Turn handling
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# :section: Object overrides
+# The following methods are overrides for built-in Object methods.  These
+# overrides are to allow for proper equality checking, duplication, etc.
+# ------------------------------------------------------------------------------
+
+  def dup
+    state = {
+      :diamonds_foundation => @diamonds_foundation.dup,
+      :clubs_foundation => @clubs_foundation.dup,
+      :spades_foundation => @spades_foundation.dup,
+      :hearts_foundation => @hearts_foundation.dup,
+      :tableaus => @tableaus.map { |tableau| tableau.dup },
+      :unused_waste => @unused_waste.dup,
+      :used_waste => @used_waste.dup,
+      :turn_count => @turn_count
+    }
+
+    SolitaireBoard.new state
+  end
+
+  def eql?(board)
+    @turn_count == board.turn_count && eql_except_for_turn_count?(board)
+  end
+
+  def ==(board)
+    eql? board
+  end
+
+  def hash
+    value = 0
+    value ^= @diamonds_foundation.hash
+    value ^= @clubs_foundation.hash
+    value ^= @spades_foundation.hash
+    value ^= @hearts_foundation.hash
+    value ^= @unused_waste.hash
+    value ^= @used_waste.hash
+    value ^= @tableaus.hash
+    value ^= @turn_count.hash
+    value
+  end
+
+  def to_s
+    "Solitaire Board: #{hash}"
+  end
+
+# ------------------------------------------------------------------------------
+# :section: Private functions
+# ------------------------------------------------------------------------------
 private
+
+  def check_equal(other, variable)
+    mine = instance_variable_get(variable)
+    theirs = other.instance_variable_get(variable)
+    mine.eql? theirs
+  end
+
   # Gets a state value from the state hash.  If no value with the given ID is
   # found (returns nil) and a block was provided then the block will be run and
   # its return value used.
   def get_state(state, id, &block)
-    s = state[id]
+    s = state[id] unless state.nil?
     return s unless s.nil?
 
     yield block unless block.nil?
