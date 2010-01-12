@@ -123,4 +123,24 @@ class TableauTest < Test::Unit::TestCase
 
     assert_not_equal column1, column2
   end
+
+  def test_card_display_displays_hidden_for_hidden_index
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    d = Tableau.new [c1, c2, c3]
+
+    assert_equal "[###]", d.card_display(1)
+  end
+
+  def test_card_display_displays_normal_after_hidden
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    d = Tableau.new [c1, c2, c3]
+
+    assert_equal "[ 3C]", d.card_display(2)
+  end
 end

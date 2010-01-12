@@ -407,6 +407,16 @@ class StackOfCardsTest < Test::Unit::TestCase
     assert_equal c5, popped[1]
   end
 
+  def test_card_display
+    c1 = Card.get(1, :hearts)
+    c2 = Card.get(10, :spades)
+    c3 = Card.get(3, :clubs)
+
+    d = StackOfCards.new [c1, c2, c3]
+
+    assert_equal "[10S]", d.card_display(1)
+  end
+
   def default_stack_cards_array
     [
       Card.get(1, :hearts),

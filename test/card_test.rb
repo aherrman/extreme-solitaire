@@ -212,9 +212,14 @@ class CardTest < Test::Unit::TestCase
     assert !(c1 < c2)
   end
 
+  def test_inspect
+    c = Card.new 2, :hearts
+    assert_equal "2 of hearts", c.inspect
+  end
+
   def test_to_s
     c = Card.new 2, :hearts
-    assert_equal "2 of hearts", c.to_s
+    assert_equal "[ 2H]", c.to_s
   end
 
   def test_dup

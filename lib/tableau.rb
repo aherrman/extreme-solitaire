@@ -48,6 +48,16 @@ class Tableau < ValidatedStack
     super(stack)
   end
 
+  # Gets the display representation of the card at the given index.  This class
+  # treats the hidden cards
+  def card_display(i)
+    if(i < @hidden_cards.size)
+      Card::HIDDEN_CARD_STRING
+    else
+      Card.card_to_s(@cards[i - @hidden_cards.size])
+    end
+  end
+
 # ------------------------------------------------------------------------------
 # :section: Mutating functions
 # These are the methods that mutate the object

@@ -120,6 +120,13 @@ class StackOfCards
     @cards.dup
   end
 
+  # Gets the display representation of the card at the given index.  If no card
+  # exists at that index then the blank card string (Card::BLANK_CARD_STRING) is
+  # returned.
+  def card_display(i)
+    Card.card_to_s(@cards[i])
+  end
+
 # ------------------------------------------------------------------------------
 # :section: Mutating functions
 # All functions in this section mutate the object it was called on

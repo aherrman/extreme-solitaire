@@ -198,11 +198,46 @@ class SolitaireBoard
     "Solitaire Board: #{hash}"
   end
 
+  def inspect
+    s = ""
+    s << Card.card_to_s(@diamonds_foundation.bottom, true)
+    s << "  "
+    s << Card.card_to_s(@clubs_foundation.bottom, true)
+    s << "  "
+    s << Card.card_to_s(@hearts_foundation.bottom, true)
+    s << "  "
+    s << Card.card_to_s(@spades_foundation.bottom, true)
+    s << "  - "
+    s << Card.card_to_s(top_waste_card, true)
+    s << " / "
+    s << "(#{num_unused_waste_cards})"
+    s << "\n\n"
+
+    max_cards = @tableaus.inject(0) do |max, tableau|
+      count = tableau.num_hidden + tableau.size
+      count > max ? count : max
+    end
+
+    (0...max_cards).each do |card_index|
+      @tableaus.each do |tableau|
+        s << tableau.card_display(card_index)
+        s << "  "
+      end
+      s << "\n"
+    end
+
+    s
+  end
+
 # ------------------------------------------------------------------------------
 # :section: Private functions
 # ------------------------------------------------------------------------------
 private
 
+  # Use to check the equality of private variables in this class and the
+  # provided class.  This is provided for getting access to another board's
+  # private data that doesn't have a public getter without having to define
+  # private accessors for each.
   def check_equal(other, variable)
     mine = instance_variable_get(variable)
     theirs = other.instance_variable_get(variable)
