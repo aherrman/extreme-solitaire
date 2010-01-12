@@ -219,7 +219,7 @@ class CardTest < Test::Unit::TestCase
 
   def test_to_s
     c = Card.new 2, :hearts
-    assert_equal "[ 2H]", c.to_s
+    assert_equal "[2 H]", c.to_s
   end
 
   def test_dup

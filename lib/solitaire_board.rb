@@ -152,6 +152,7 @@ class SolitaireBoard
 # :section: Turn handling
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # :section: Object overrides
 # The following methods are overrides for built-in Object methods.  These
@@ -159,18 +160,7 @@ class SolitaireBoard
 # ------------------------------------------------------------------------------
 
   def dup
-    state = {
-      :diamonds_foundation => @diamonds_foundation.dup,
-      :clubs_foundation => @clubs_foundation.dup,
-      :spades_foundation => @spades_foundation.dup,
-      :hearts_foundation => @hearts_foundation.dup,
-      :tableaus => @tableaus.map { |tableau| tableau.dup },
-      :unused_waste => @unused_waste.dup,
-      :used_waste => @used_waste.dup,
-      :turn_count => @turn_count
-    }
-
-    SolitaireBoard.new state
+    SolitaireBoard.new to_state_hash
   end
 
   def eql?(board)
@@ -233,6 +223,20 @@ class SolitaireBoard
 # :section: Private functions
 # ------------------------------------------------------------------------------
 private
+  # Copies this board's full state into a hash table suitable for passing to
+  # SolitaireBoard.new
+  def to_state_hash
+    {
+      :diamonds_foundation => @diamonds_foundation.dup,
+      :clubs_foundation => @clubs_foundation.dup,
+      :spades_foundation => @spades_foundation.dup,
+      :hearts_foundation => @hearts_foundation.dup,
+      :tableaus => @tableaus.map { |tableau| tableau.dup },
+      :unused_waste => @unused_waste.dup,
+      :used_waste => @used_waste.dup,
+      :turn_count => @turn_count
+    }
+  end
 
   # Use to check the equality of private variables in this class and the
   # provided class.  This is provided for getting access to another board's

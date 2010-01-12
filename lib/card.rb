@@ -117,11 +117,10 @@ class Card
   end
 
   def to_s
-    if value < 10
-      "[ #{value}#{suit_string}]"
-    else
-      "[#{value}#{suit_string}]"
-    end
+    val_str = Card::VALUE_STRING[value]
+    val_str = "#{value} " if val_str.nil?
+
+    "[#{val_str}#{suit_string}]"
   end
 
   # Simple string representation of the card
@@ -145,6 +144,14 @@ class Card
 protected
   SHORT_SUIT_STRINGS = {:hearts => "H", :spades => "S", :clubs => "C",
       :diamonds => "D"}
+
+  VALUE_STRING = {
+    1 => "A ",
+    10 => "10",
+    11 => "J ",
+    12 => "Q ",
+    13 => "K "
+  }
 
   # Validates a suit.
   #

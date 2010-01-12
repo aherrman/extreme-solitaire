@@ -141,6 +141,6 @@ class TableauTest < Test::Unit::TestCase
 
     d = Tableau.new [c1, c2, c3]
 
-    assert_equal "[ 3C]", d.card_display(2)
+    assert_equal "[3 C]", d.card_display(2)
   end
 end
