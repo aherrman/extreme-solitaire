@@ -2,9 +2,13 @@ require 'validated_stack'
 require 'foundation'
 require 'tableau'
 require 'immutable_proxy'
+require 'eql_helper'
+require 'hash_helper'
 
 # The solitaire board
 class SolitaireBoard
+  include EqlHelper
+  include HashHelper
 
 # ------------------------------------------------------------------------------
 # :section: Construction
@@ -135,17 +139,10 @@ class SolitaireBoard
 # :section: Misc Public Methods
 # ------------------------------------------------------------------------------
 
-  # Checks to see if another board is equal to this one in every way except for
-  # the turn count.  Usefulf for seeing if a particular board configuration has
-  # been seen before.
-  def eql_except_for_turn_count?(board)
-    check_equal(board, :@diamonds_foundation) &&
-    check_equal(board, :@clubs_foundation) &&
-    check_equal(board, :@spades_foundation) &&
-    check_equal(board, :@hearts_foundation) &&
-    check_equal(board, :@unused_waste) &&
-    check_equal(board, :@used_waste) &&
-    check_equal(board, :@tableaus)
+  # Checks to see if another board is equal to this one.  Unlike eql? this
+  # includes the turn count in the check.
+  def eql_including_turn_count?(board)
+    @turn_count == board.turn_count && eql?(board)
   end
 
 # ------------------------------------------------------------------------------
@@ -163,8 +160,18 @@ class SolitaireBoard
     SolitaireBoard.new to_state_hash
   end
 
+  # Checks if this board is equal to another objects.  This ignores the turn
+  # count.
   def eql?(board)
-    @turn_count == board.turn_count && eql_except_for_turn_count?(board)
+    check_equal(self, board, [
+        :@diamonds_foundation,
+        :@clubs_foundation,
+        :@spades_foundation,
+        :@hearts_foundation,
+        :@unused_waste,
+        :@used_waste,
+        :@tableaus
+    ])
   end
 
   def ==(board)
@@ -172,16 +179,15 @@ class SolitaireBoard
   end
 
   def hash
-    value = 0
-    value ^= @diamonds_foundation.hash
-    value ^= @clubs_foundation.hash
-    value ^= @spades_foundation.hash
-    value ^= @hearts_foundation.hash
-    value ^= @unused_waste.hash
-    value ^= @used_waste.hash
-    value ^= @tableaus.hash
-    value ^= @turn_count.hash
-    value
+    generate_hash(self, [
+        :@diamonds_foundation,
+        :@clubs_foundation,
+        :@spades_foundation,
+        :@hearts_foundation,
+        :@unused_waste,
+        :@used_waste,
+        :@tableaus
+    ])
   end
 
   def to_s
@@ -236,16 +242,6 @@ private
       :used_waste => @used_waste.dup,
       :turn_count => @turn_count
     }
-  end
-
-  # Use to check the equality of private variables in this class and the
-  # provided class.  This is provided for getting access to another board's
-  # private data that doesn't have a public getter without having to define
-  # private accessors for each.
-  def check_equal(other, variable)
-    mine = instance_variable_get(variable)
-    theirs = other.instance_variable_get(variable)
-    mine.eql? theirs
   end
 
   # Gets a state value from the state hash.  If no value with the given ID is

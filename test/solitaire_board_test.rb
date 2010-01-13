@@ -268,24 +268,44 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert_not_equal board1, board2
   end
 
-  def test_not_equal_when_turn_count_is_different
+  def test_equal_when_only_turn_count_is_different
     state1 = { :turn_count => 1 }
     state2 = { :turn_count => 2 }
 
     board1 = SolitaireBoard.new state1
     board2 = SolitaireBoard.new state2
 
-    assert_not_equal board1, board2
+    assert_equal board1, board2
   end
 
-  def test_equal_except_for_turn_count_ignores_turn_count
+  def test_eql_ignores_turn_count
     state1 = { :turn_count => 1 }
     state2 = { :turn_count => 2 }
 
     board1 = SolitaireBoard.new state1
     board2 = SolitaireBoard.new state2
 
-    assert board1.eql_except_for_turn_count?(board2)
+    assert_equal board1, board2
+  end
+
+  def test_eql_including_turn_count
+    state1 = { :turn_count => 1 }
+    state2 = { :turn_count => 1 }
+
+    board1 = SolitaireBoard.new state1
+    board2 = SolitaireBoard.new state2
+
+    assert board1.eql_including_turn_count?(board2)
+  end
+
+  def test_eql_including_turn_count_checks_turn_count
+    state1 = { :turn_count => 1 }
+    state2 = { :turn_count => 2 }
+
+    board1 = SolitaireBoard.new state1
+    board2 = SolitaireBoard.new state2
+
+    assert ! board1.eql_including_turn_count?(board2)
   end
 
   def test_same_boards_have_same_hash
@@ -304,5 +324,15 @@ class SolitaireBoardTest < Test::Unit::TestCase
     board2 = SolitaireBoard.build_from_deck deck.shuffle
 
     assert_not_equal board1.hash, board2.hash
+  end
+
+  def test_hash_ignores_turn_count
+    state1 = { :turn_count => 1 }
+    state2 = { :turn_count => 2 }
+
+    board1 = SolitaireBoard.new state1
+    board2 = SolitaireBoard.new state2
+
+    assert_equal board1.hash, board2.hash
   end
 end
