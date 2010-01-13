@@ -163,7 +163,7 @@ class SolitaireBoard
   # Checks if this board is equal to another objects.  This ignores the turn
   # count.
   def eql?(board)
-    check_equal(self, board, [
+    check_equal(board, [
         :@diamonds_foundation,
         :@clubs_foundation,
         :@spades_foundation,
@@ -179,7 +179,7 @@ class SolitaireBoard
   end
 
   def hash
-    generate_hash(self, [
+    generate_hash([
         :@diamonds_foundation,
         :@clubs_foundation,
         :@spades_foundation,
