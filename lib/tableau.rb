@@ -29,25 +29,6 @@ class Tableau < ValidatedStack
     @hidden_cards.size
   end
 
-  def can_append_card?(card)
-    if size == 0 && @hidden_cards.empty?
-      return true if card.value == Card::KING
-      return false
-    end
-    super(card)
-  end
-
-  def can_append?(stack)
-    top = stack.top
-
-    if size == 0 && @hidden_cards.empty?
-      return true if top.value == Card::KING
-      return false
-    end
-
-    super(stack)
-  end
-
   # Gets the display representation of the card at the given index.  This class
   # treats the hidden cards
   def card_display(i)

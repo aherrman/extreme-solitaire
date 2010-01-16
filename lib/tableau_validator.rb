@@ -29,6 +29,7 @@ class TableauStackValidator
   end
 
   def can_append_card?(stack, card)
+    return false unless is_valid_stack? stack
     is_valid_transition?(stack.bottom, card)
   end
 

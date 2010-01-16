@@ -13,7 +13,17 @@ class ImmutableProxy
   end
 
   def method_missing(name, *args, &block)
-    send_to_target(name, *args, &block)
+    ret = send_to_target(name, *args, &block)
+
+    # Some of the methods we use return a new object of the same type as the
+    # original target class.  We need to wrap those in an ImmutableProxy as
+    # well to make sure the user can't "cheat" by duplicating the target and
+    # then modifying it.
+    if ret.is_a?(@target.class)
+      ImmutableProxy.new ret
+    else
+      ret
+    end
   end
 
   def respond_to?(name, include_private=false)
