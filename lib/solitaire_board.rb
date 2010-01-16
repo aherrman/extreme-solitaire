@@ -30,10 +30,10 @@ class SolitaireBoard
       tableaus.push Tableau.new stack
     end
 
-    unused_waste = deck
+    stock = deck
 
     state[:tableaus] = tableaus
-    state[:unused_waste] = unused_waste
+    state[:stock] = stock
 
     SolitaireBoard.new state
   end
@@ -51,8 +51,8 @@ class SolitaireBoard
   # [:spades_foundation] The spades foundation (aces stack)
   # [:tableaus] Array of all the tableaus (columns).
   #             Only the first 7 entries in the array will be used.
-  # [:unused_waste] The unused waste pile (stack of cards)
-  # [:used_waste] The used waste pile (stack of cards)
+  # [:stock] The stock of cards left in the deck (stack of cards)
+  # [:waste] The waste pile (stack of cards)
   # [:turn_count] The number of turns that have happened so far
   def initialize(state=nil)
     @diamonds_foundation = get_state(state, :diamonds_foundation) {
@@ -78,15 +78,16 @@ class SolitaireBoard
       }
     end
 
-    @unused_waste = get_state(state, :unused_waste) {
+    @stock = get_state(state, :stock) {
       StackOfCards.new []
     }
-    @used_waste = get_state(state, :used_waste) {
+    @waste = get_state(state, :waste) {
       StackOfCards.new []
     }
 
     @turn_count = get_state(state, :turn_count) { 0 }
     @moving = false
+    @next_waste_card = nil
   end
 
 # ------------------------------------------------------------------------------
@@ -113,21 +114,21 @@ class SolitaireBoard
     tableau.num_hidden
   end
 
-  # The card at the top of the used waste pile
+  # The card at the top of the waste pile
   def top_waste_card
     # The usable waste card is actually the one on the bottom of the used pile,
     # since appends/removes happen at the bottom.
-    @used_waste.bottom
+    @waste.bottom
   end
 
-  # The number of cards in the unused waste pile
-  def num_unused_waste_cards
-    @unused_waste.size
+  # The number of cards in the stock pile
+  def num_stock_cards
+    @stock.size
   end
 
-  # The number of cards in the used waste pile
-  def num_used_waste_cards
-    @used_waste.size
+  # The number of cards in the waste pile
+  def num_waste_cards
+    @waste.size
   end
 
   # The top card in the diamonds foundation.
@@ -174,7 +175,7 @@ class SolitaireBoard
     s << "  - "
     s << Card.card_to_s(top_waste_card, true)
     s << " / "
-    s << "(#{num_unused_waste_cards})"
+    s << "(#{num_stock_cards})"
     s << "\n\n"
 
     max_cards = @tableaus.inject(0) do |max, tableau|
@@ -201,15 +202,13 @@ class SolitaireBoard
   # Raises an error if the move cannot be completed.
   # This version of the method modifies the current board instead of creating a
   # new board.
-  def move_bottom_card_to_foundation!(tableau_index)
+  def move_from_tableau_to_foundation!(from_tableau_index)
     do_move do
-      tableau = get_tableau_for_move(tableau_index)
+      from_tableau = get_tableau_for_move(from_tableau_index)
 
-      new_tableau, bottom_card = tableau.remove_card
+      new_from_tableau, bottom_card = from_tableau.remove_card
 
-      if bottom_card.nil?
-        raise "Tableau at #{tableau_index} is empty"
-      end
+      raise "Tableau at #{from_tableau_index} is empty" if bottom_card.nil?
 
       suit = bottom_card.suit
 
@@ -217,7 +216,7 @@ class SolitaireBoard
 
       new_foundation = foundation.append_card bottom_card
 
-      set_tableau_after_move(tableau_index, new_tableau)
+      set_tableau_after_move(from_tableau_index, new_from_tableau)
       set_foundation_after_move(suit, new_foundation)
     end
   end
@@ -239,18 +238,68 @@ class SolitaireBoard
   # Moves the top card on the waste pile to one of the tableaus
   def move_top_waste_card_to_tableau!(to_tableau_index)
     do_move do
-      new_used_waste, card = @used_waste.remove_card
+      new_waste, card = @waste.remove_card
 
-      if card.nil?
-        raise "No waste card to move"
-      end
+      raise "No waste card to move" if card.nil?
 
       to_tableau = get_tableau_for_move(to_tableau_index)
 
       new_to_tableau = to_tableau.append_card card
 
-      @used_waste = new_used_waste
+      @waste = new_waste
       set_tableau_after_move(to_tableau_index, new_to_tableau)
+    end
+  end
+
+  # Moves the top waste card to the foundation for its suit
+  def move_top_waste_card_to_foundation!
+    do_move do
+      new_waste, card = @waste.remove_card
+
+      raise "No waste card to move" if card.nil?
+
+      suit = card.suit
+
+      foundation = get_foundation_for_move(suit)
+
+      new_foundation = foundation.append_card card
+
+      @waste = new_waste
+      set_foundation_after_move(suit, new_foundation)
+    end
+  end
+
+  # Moves the top card from a foundation to a tableau
+  def move_from_foundation_to_tableau!(suit, to_tableau_index)
+    do_move do
+      foundation = get_foundation_for_move(suit)
+      to_tableau = get_tableau_for_move(to_tableau_index)
+
+      new_foundation, card = foundation.remove_card
+
+      raise "No card on foundation to move" if card.nil?
+
+      new_to_tableau = to_tableau.append_card card
+
+      set_foundation_after_move(suit, foundation)
+      set_tableau_after_move(to_tableau_index, new_to_tableau)
+    end
+  end
+
+  # Flips the next stock card over.  If no more cards are left in the stock
+  # pile then the waste pile is flipped back over into the stock pile.
+  def flip_next_stock_card!
+    do_move do
+      if @stock.size == 0
+        if @waste.size == 0 
+          raise "No waste or stock cards left"
+        end
+
+        @stock = StackOfCards.new @waste.to_a.reverse
+        @waste = StackOfCards.new []
+      else
+        @next_waste_card = @stock.remove_card!
+      end
     end
   end
 
@@ -259,6 +308,10 @@ class SolitaireBoard
   # to finalize.
   def finalize_move!
     return unless @moving
+    unless @next_waste_card.nil?
+      @waste.append_card! @next_waste_card
+      @next_waste_card = nil
+    end
     @tableaus.each { |tableau| tableau.update_from_hidden_if_empty!  }
     @moving = false
   end
@@ -281,8 +334,8 @@ class SolitaireBoard
         :@clubs_foundation,
         :@spades_foundation,
         :@hearts_foundation,
-        :@unused_waste,
-        :@used_waste,
+        :@stock,
+        :@waste,
         :@tableaus
     ])
   end
@@ -297,8 +350,8 @@ class SolitaireBoard
         :@clubs_foundation,
         :@spades_foundation,
         :@hearts_foundation,
-        :@unused_waste,
-        :@used_waste,
+        :@stock,
+        :@waste,
         :@tableaus
     ])
   end
@@ -320,8 +373,8 @@ private
       :spades_foundation => @spades_foundation.dup,
       :hearts_foundation => @hearts_foundation.dup,
       :tableaus => @tableaus.map { |tableau| tableau.dup },
-      :unused_waste => @unused_waste.dup,
-      :used_waste => @used_waste.dup,
+      :stock => @stock.dup,
+      :waste => @waste.dup,
       :turn_count => @turn_count
     }
   end

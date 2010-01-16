@@ -42,8 +42,8 @@ class SolitaireBoardTest < Test::Unit::TestCase
       :spades_foundation => spades_foundation,
       :hearts_foundation => hearts_foundation,
       :tableaus => tableaus,
-      :unused_waste => unused,
-      :used_waste => used,
+      :stock => unused,
+      :waste => used,
       :turn_count => turns
     }
 
@@ -65,8 +65,8 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert_equal empty_tableau, board.get_tableau_cards(6)
 
     assert_equal used[0], board.top_waste_card
-    assert_equal used.size, board.num_used_waste_cards
-    assert_equal unused.size, board.num_unused_waste_cards
+    assert_equal used.size, board.num_waste_cards
+    assert_equal unused.size, board.num_stock_cards
     assert_equal turns, board.turn_count
   end
 
@@ -110,8 +110,8 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     assert_equal 0, board.turn_count
 
-    assert_equal 0, board.num_used_waste_cards
-    assert_equal 24, board.num_unused_waste_cards
+    assert_equal 0, board.num_waste_cards
+    assert_equal 24, board.num_stock_cards
   end
 
   def test_equal
@@ -213,13 +213,13 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert_not_equal board1, board3
   end
 
-  def test_not_equal_when_unused_waste_is_different
+  def test_not_equal_when_stock_is_different
     c1 = Card.get Card::ACE, :spades
     c2 = Card.get 2, :spades
     c3 = Card.get 3, :spades
 
-    state1 = { :unused_waste => StackOfCards.new([c1, c2]) }
-    state2 = { :unused_waste => StackOfCards.new([c1, c2, c3]) }
+    state1 = { :stock => StackOfCards.new([c1, c2]) }
+    state2 = { :stock => StackOfCards.new([c1, c2, c3]) }
 
     board1 = SolitaireBoard.new state1
     board2 = SolitaireBoard.new state2
@@ -227,13 +227,13 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert_not_equal board1, board2
   end
 
-  def test_not_equal_when_used_waste_is_different
+  def test_not_equal_when_waste_is_different
     c1 = Card.get Card::ACE, :spades
     c2 = Card.get 2, :spades
     c3 = Card.get 3, :spades
 
-    state1 = { :used_waste => StackOfCards.new([c1, c2]) }
-    state2 = { :used_waste => StackOfCards.new([c1, c2, c3]) }
+    state1 = { :waste => StackOfCards.new([c1, c2]) }
+    state2 = { :waste => StackOfCards.new([c1, c2, c3]) }
 
     board1 = SolitaireBoard.new state1
     board2 = SolitaireBoard.new state2
@@ -309,7 +309,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert_equal board1.hash, board2.hash
   end
 
-  def test_move_bottom_card_to_foundation
+  def test_move_from_tableau_to_foundation
     d1 = Card.get Card::ACE, :diamonds
     d2 = Card.get 2, :diamonds
     d3 = Card.get 3, :diamonds
@@ -328,12 +328,12 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    board.move_bottom_card_to_foundation!(1)
+    board.move_from_tableau_to_foundation!(1)
 
     assert_equal d3, board.diamonds_foundation_top
   end
 
-  def test_move_bottom_card_to_foundation_throws_error_on_invalid_move
+  def test_move_from_tableau_to_foundation_throws_error_on_invalid_move
     d1 = Card.get Card::ACE, :diamonds
     d2 = Card.get 2, :diamonds
     d3 = Card.get 3, :diamonds
@@ -353,11 +353,11 @@ class SolitaireBoardTest < Test::Unit::TestCase
     board = SolitaireBoard.new state
 
     assert_raise(InvalidMoveError) {
-      board.move_bottom_card_to_foundation!(0)
+      board.move_from_tableau_to_foundation!(0)
     }
   end
 
-  def test_move_bottom_card_to_foundation_increments_turn_count
+  def test_move_increments_turn_count
     d1 = Card.get Card::ACE, :diamonds
     d2 = Card.get 2, :diamonds
     d3 = Card.get 3, :diamonds
@@ -376,7 +376,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    board.move_bottom_card_to_foundation!(1)
+    board.move_from_tableau_to_foundation!(1)
 
     assert_equal 1, board.turn_count
   end
@@ -400,19 +400,21 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    board.move_bottom_card_to_foundation!(1)
+    board.move_from_tableau_to_foundation!(1)
 
     assert_raise(InvalidMoveError) {
-      board.move_bottom_card_to_foundation!(0)
+      board.move_from_tableau_to_foundation!(0)
     }
   end
 
   def test_move_between_tableaus
     h4 = Card.get(4, :hearts)
     c3 = Card.get(3, :clubs)
+    d2 = Card.get(2, :diamonds)
     c7 = Card.get(7, :clubs)
     tableau1 = Tableau.new [h4]
     tableau2 = Tableau.new [c7, c3]
+    tableau2.append_card! d2
 
     tableaus = [tableau1, tableau2]
 
@@ -422,14 +424,14 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    board.move_between_tableaus!(1, 0, 1)
+    board.move_between_tableaus!(1, 0, 2)
 
     t1_cards = board.get_tableau_cards(0)
     board.finalize_move!
 
     assert_equal h4, board.get_tableau_cards(0)[0]
     assert_equal c3, board.get_tableau_cards(0)[1]
-    assert_equal 2, board.get_tableau_cards(0).size
+    assert_equal 3, board.get_tableau_cards(0).size
 
     assert_equal c7, board.get_tableau_cards(1)[0]
     assert_equal 1, board.get_tableau_cards(1).size
@@ -469,7 +471,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     state = {
       :tableaus => tableaus,
-      :used_waste => used,
+      :waste => used,
     }
 
     board = SolitaireBoard.new state
@@ -510,18 +512,225 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     tableaus = [tableau1, tableau2]
 
-    used = StackOfCards.new [Card.get(10, :hearts), h6]
+    waste = StackOfCards.new [Card.get(10, :hearts), h6]
 
     state = {
       :tableaus => tableaus,
-      :used_waste => used,
+      :waste => waste,
     }
 
     board = SolitaireBoard.new state
 
-    tssert_raise(InvalidMoveError) {
+    assert_raise(InvalidMoveError) {
       board.move_top_waste_card_to_tableau! 1
     }
+  end
+
+  def test_move_top_waste_card_to_foundation
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+    waste = StackOfCards.new [Card.get(10, :hearts), d3]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    board.move_top_waste_card_to_foundation!
+
+    assert_equal d3, board.diamonds_foundation_top
+  end
+
+  def test_move_top_waste_card_to_foundation_fails_on_invalid_move
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d4 = Card.get 4, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+    waste = StackOfCards.new [Card.get(10, :hearts), d4]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    assert_raise(InvalidMoveError) {
+      board.move_top_waste_card_to_foundation!
+    }
+  end
+
+  def test_move_top_waste_card_to_foundation_fails_when_no_waste
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+    }
+
+    board = SolitaireBoard.new state
+
+    assert_raise(InvalidMoveError) {
+      board.move_top_waste_card_to_foundation!
+    }
+  end
+
+  def test_move_from_foundation_to_tableau
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+    s4 = Card.get 4, :spades
+
+    diamonds_foundation = Foundation.new [d1, d2, d3], :diamonds
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), s4]
+
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    board.move_from_foundation_to_tableau!(:diamonds, 1)
+
+    assert_equal 2, board.get_tableau_cards(1).size
+    assert_equal s4, board.get_tableau_cards(1)[0]
+    assert_equal d3, board.get_tableau_cards(1)[1]
+  end
+
+  def test_move_from_foundation_to_tableau_fails_on_invalid_move
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2, d3], :diamonds
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), Card.get(5, :spades)]
+
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    assert_raise(InvalidMoveError) {
+      board.move_from_foundation_to_tableau!(:diamonds, 1)
+    }
+  end
+
+  def test_flip_next_stock_card_when_cards_available
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    stock = StackOfCards.new [d2, d3]
+    waste = StackOfCards.new [d1]
+
+    state = {
+      :stock => stock,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    board.flip_next_stock_card!
+    board.finalize_move!
+
+    assert_equal d3, board.top_waste_card
+    assert_equal 2, board.num_waste_cards
+    assert_equal 1, board.num_stock_cards
+  end
+
+  def test_flip_next_stock_card_doesnt_show_card_until_finalized
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    stock = StackOfCards.new [d2, d3]
+    waste = StackOfCards.new [d1]
+
+    state = {
+      :stock => stock,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    board.flip_next_stock_card!
+
+    assert_equal d1, board.top_waste_card
+    assert_equal 1, board.num_waste_cards
+    assert_equal 1, board.num_stock_cards
+  end
+
+  def test_flip_next_stock_card_resets_stock_when_empty
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    stock = StackOfCards.new []
+    waste = StackOfCards.new [d1, d2, d3]
+
+    state = {
+      :stock => stock,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    board.flip_next_stock_card!
+
+    assert board.top_waste_card.nil?
+    assert_equal 3, board.num_stock_cards
+  end
+
+  def test_flip_next_stock_card_preserves_correct_order_on_reset
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    stock = StackOfCards.new []
+    waste = StackOfCards.new [d1, d2, d3]
+
+    state = {
+      :stock => stock,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    board.flip_next_stock_card!
+    board.finalize_move!
+
+    assert board.top_waste_card.nil?
+
+    board.flip_next_stock_card!
+    board.finalize_move!
+    assert_equal d1, board.top_waste_card
+
+    board.flip_next_stock_card!
+    board.finalize_move!
+    assert_equal d2, board.top_waste_card
+
+    board.flip_next_stock_card!
+    board.finalize_move!
+    assert_equal d3, board.top_waste_card
   end
 
   def test_finalize_flips_hidden_cards
@@ -544,7 +753,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    board.move_bottom_card_to_foundation!(1)
+    board.move_from_tableau_to_foundation!(1)
 
     assert board.get_tableau_cards(1).bottom.nil?
 
