@@ -2,12 +2,6 @@ $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
 require 'test/unit'
 require 'solitaire_board'
-require 'turn/tableau_to_foundation_turn'
-require 'turn/tableau_to_tableau_turn'
-require 'turn/waste_to_tableau_turn'
-require 'turn/waste_to_foundation_turn'
-require 'turn/foundation_to_tableau_turn'
-require 'turn/flip_stock_turn'
 
 class TurnsTest < Test::Unit::TestCase
 

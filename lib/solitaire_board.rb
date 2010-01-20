@@ -4,6 +4,12 @@ require 'tableau'
 require 'immutable_proxy'
 require 'eql_helper'
 require 'hash_helper'
+require 'turn/tableau_to_foundation_turn'
+require 'turn/tableau_to_tableau_turn'
+require 'turn/waste_to_tableau_turn'
+require 'turn/waste_to_foundation_turn'
+require 'turn/foundation_to_tableau_turn'
+require 'turn/flip_stock_turn'
 
 # Error used by the board to indicate an invalid move was attempted
 class InvalidMoveError < RuntimeError
@@ -200,6 +206,78 @@ class SolitaireBoard
 # ------------------------------------------------------------------------------
 # :section: Turn handling
 # ------------------------------------------------------------------------------
+
+  # Gets a list of all the valid turns that can be applied to the current
+  # board.
+  def get_valid_turns
+    get_waste_turns + get_tableau_turns + get_foundation_turns + get_stock_turns
+  end
+
+  # Gets the possible turns involving moving the top waste card.
+  def get_waste_turns
+    turns = []
+    card = top_waste_card
+
+    return turns if card.nil?
+
+    begin
+      foundation = get_foundation_for_move(card.suit)
+      if foundation.can_append_card? card
+        turns << WasteToFoundationTurn.new(self)
+      end
+    rescue
+      # Ignore the exception, we'll just move on to other possible turns
+    end
+
+    @tableaus.each_index do |tableau_index|
+      tableau = @tableaus[tableau_index]
+      if tableau.can_append_card? card
+        turns << WasteToTableauTurn.new(self, tableau_index)
+      end
+    end
+
+    turns
+  end
+
+  # Gets the possible turns moving cards from the tableaus
+  def get_tableau_turns
+    turns = []
+
+    @tableaus.each_index do |tableau_index|
+      get_turns_for_single_tableau(tableau_index, turns)
+    end
+
+    turns
+  end
+
+  # Gets the possible turns moving cards from the foundations
+  def get_foundation_turns
+    turns = []
+
+    [@diamonds_foundation, @spades_foundation, @hearts_foundation,
+        @clubs_foundation].each do |foundation|
+      bottom_card = foundation.bottom
+      next if bottom_card.nil?
+
+      stack = StackOfCards.new [foundation.bottom]
+      indices = get_tableaus_stack_can_be_appended_to(stack)
+
+      indices.each { |index|
+        turns << FoundationToTableauTurn.new(self, foundation.suit, index)
+      }
+    end
+
+    turns
+  end
+
+  # Gets the possible turns involving the stock
+  def get_stock_turns
+    if !(@stock.empty? && @waste.empty?)
+      [FlipStockTurn.new self]
+    else
+      []
+    end
+  end
 
   # Moves the bottom card on the tableau to the foundation for its suit.
   # Raises an error if the move cannot be completed.
@@ -460,5 +538,49 @@ private
       raise InvalidMoveError, "Unable to do move: #{e.message}"
     end
     @turn_count += 1
+  end
+
+  # Gets all turns possible from a single tableau and adds them to the passed
+  # in turns array
+  def get_turns_for_single_tableau(tableau_index, turns=nil)
+    turns = [] if turns.nil?
+
+    tableau = get_tableau_for_move tableau_index
+
+    1.upto(tableau.size) do |size|
+      new_tableau, stack = tableau.remove_stack(size)
+
+      appendable_indices = get_tableaus_stack_can_be_appended_to(stack)
+
+      appendable_indices.each do |index|
+        next if index == tableau_index
+        turns << TableauToTableauTurn.new(self, tableau_index, index, size)
+      end
+    end
+
+    bottom_card = tableau.bottom
+    return turns if bottom_card.nil?
+
+    foundation = get_foundation_for_move(bottom_card.suit)
+    if foundation.can_append_card?(bottom_card)
+      turns << TableauToFoundationTurn.new(self, tableau_index)
+    end
+
+    turns
+  end
+
+  # Gets the indices of all tableaus the given stack can be appended to.
+  def get_tableaus_stack_can_be_appended_to(stack)
+    indices = []
+
+    @tableaus.each_index do |tableau_index|
+      tableau = @tableaus[tableau_index]
+
+      if tableau.can_append?(stack)
+        indices << tableau_index
+      end
+    end
+
+    indices
   end
 end

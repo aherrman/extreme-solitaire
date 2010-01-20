@@ -761,4 +761,199 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     assert_equal c7, board.get_tableau_cards(1).bottom
   end
+
+  def test_get_waste_turns_for_waste_to_tableau
+    d7 = Card.get 7, :diamonds
+    c6 = Card.get 6, :clubs
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), d7]
+
+    tableaus = [tableau1, tableau2]
+
+    used = StackOfCards.new [Card.get(10, :hearts), c6]
+
+    state = {
+      :tableaus => tableaus,
+      :waste => used,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_waste_turns
+
+    assert_equal 1, turns.size
+    assert turns[0].is_a?(WasteToTableauTurn)
+    assert_equal 1, turns[0].to_tableau_index
+  end
+
+  def test_get_waste_turns_for_waste_to_foundation
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+    waste = StackOfCards.new [Card.get(10, :hearts), d3]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+    turns = board.get_waste_turns
+
+    assert_equal 1, turns.size
+    assert turns[0].is_a?(WasteToFoundationTurn)
+  end
+
+  def test_get_wate_turns_when_both_are_possible
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+    waste = StackOfCards.new [Card.get(10, :hearts), d3]
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(4, :clubs)]
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :tableaus => tableaus,
+      :diamonds_foundation => diamonds_foundation,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_waste_turns
+
+    # Test shouldn't care about the order, but it's easier to do that for now.
+    assert_equal 2, turns.size
+    assert turns[0].is_a?(WasteToFoundationTurn)
+    assert turns[1].is_a?(WasteToTableauTurn)
+    assert_equal 1, turns[1].to_tableau_index
+  end
+
+  def test_get_tableau_turns_for_moves_between_tableaus
+    h4 = Card.get(4, :hearts)
+    c3 = Card.get(3, :clubs)
+    d2 = Card.get(2, :diamonds)
+    c7 = Card.get(7, :clubs)
+    tableau1 = Tableau.new [h4]
+    tableau2 = Tableau.new [c7, c3]
+    tableau2.append_card! d2
+
+    tableau3 = Tableau.new [Card.get(7, :diamonds)]
+    tableau4 = Tableau.new [Card.get(8, :spades)]
+
+    tableaus = [tableau1, tableau2, tableau3, tableau4]
+
+    state = {
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_tableau_turns
+
+    assert_equal 2, turns.size
+
+    # Order shouldn't matter, but it's easier to test right now
+    assert_equal 1, turns[0].from_tableau_index
+    assert_equal 0, turns[0].to_tableau_index
+    assert_equal 2, turns[0].num_to_move
+    assert turns[0].is_a?(TableauToTableauTurn)
+
+    assert_equal 2, turns[1].from_tableau_index
+    assert_equal 3, turns[1].to_tableau_index
+    assert_equal 1, turns[1].num_to_move
+    assert turns[1].is_a?(TableauToTableauTurn)
+  end
+
+  def test_get_tableau_turns_for_moves_to_foundation
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), d3]
+
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_tableau_turns
+
+    assert_equal 1, turns.size
+    assert turns[0].is_a?(TableauToFoundationTurn)
+    assert_equal 1, turns[0].from_tableau_index
+  end
+
+  def test_get_foundation_turns
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+    s4 = Card.get 4, :spades
+
+    diamonds_foundation = Foundation.new [d1, d2, d3], :diamonds
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), s4]
+
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_foundation_turns
+
+    assert_equal 1, turns.size
+    assert turns[0].is_a?(FoundationToTableauTurn)
+    assert_equal :diamonds, turns[0].suit
+    assert_equal 1, turns[0].to_tableau_index
+  end
+
+  def test_get_stock_turns
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    stock = StackOfCards.new [d2, d3]
+    waste = StackOfCards.new [d1]
+
+    state = {
+      :stock => stock,
+      :waste => waste,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_stock_turns
+
+    assert_equal 1, turns.size
+    assert turns[0].is_a?(FlipStockTurn)
+  end
+
+  def test_get_stock_turns_when_no_cards_left
+    state = { }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_stock_turns
+
+    assert_equal 0, turns.size
+  end
 end

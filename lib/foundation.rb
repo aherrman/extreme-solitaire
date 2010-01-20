@@ -10,6 +10,11 @@ class Foundation < ValidatedStack
     super(cards, FoundationValidator.get(suit))
   end
 
+  # The foundation's suit
+  def suit
+    @validator.suit
+  end
+
 # ------------------------------------------------------------------------------
 # :section: Object overrides
 # The following methods are overrides for built-in Object methods.  These
