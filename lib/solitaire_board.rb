@@ -14,6 +14,9 @@ class SolitaireBoard
   include EqlHelper
   include HashHelper
 
+  # Whether the board is in the middle of a move (needs finalizing) or not.
+  attr_reader :moving
+
 # ------------------------------------------------------------------------------
 # :section: Construction
 # ------------------------------------------------------------------------------
