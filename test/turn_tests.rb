@@ -91,6 +91,69 @@ class TurnsTest < Test::Unit::TestCase
     assert ! board2.equal?(board3)
   end
 
+  def test_do_turn_bang_modifies_original_board
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), d3]
+
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    turn = TableauToFoundationTurn.new(board, 1)
+
+    board2 = turn.do_turn!
+
+    assert board.equal?(board2)
+    assert_equal d3, board.diamonds_foundation_top
+  end
+
+  def test_cannot_do_anything_after_do_turn_bang
+    d1 = Card.get Card::ACE, :diamonds
+    d2 = Card.get 2, :diamonds
+    d3 = Card.get 3, :diamonds
+
+    diamonds_foundation = Foundation.new [d1, d2], :diamonds
+
+    tableau1 = Tableau.new [Card.get(5, :hearts)]
+    tableau2 = Tableau.new [Card.get(7, :clubs), d3]
+
+    tableaus = [tableau1, tableau2]
+
+    state = {
+      :diamonds_foundation => diamonds_foundation,
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    turn = TableauToFoundationTurn.new(board, 1)
+
+    turn.do_turn!
+
+    assert_raise(RuntimeError) {
+      turn.do_turn
+    }
+
+    assert_raise(RuntimeError) {
+      turn.do_turn!
+    }
+
+    assert_raise(RuntimeError) {
+      turn.try_turn
+    }
+  end
+
   def test_tableau_to_foundation_turn
     d1 = Card.get Card::ACE, :diamonds
     d2 = Card.get 2, :diamonds
