@@ -31,8 +31,7 @@ class TableauTest < Test::Unit::TestCase
     c3 = Card.get 7, :clubs
     c4 = Card.get 6, :diamonds
 
-    column = Tableau.new [c1, c2, c3]
-    column.append_card!(c4)
+    column = Tableau.new [c1, c2], [c3, c4]
     new_column, card = column.remove_card
 
     new_column.update_from_hidden_if_empty!

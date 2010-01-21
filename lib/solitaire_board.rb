@@ -209,7 +209,7 @@ class SolitaireBoard
 
   # Gets a list of all the valid turns that can be applied to the current
   # board.
-  def get_valid_turns
+  def get_turns
     get_waste_turns + get_tableau_turns + get_foundation_turns + get_stock_turns
   end
 

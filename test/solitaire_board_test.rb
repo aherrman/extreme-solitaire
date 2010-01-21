@@ -413,8 +413,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
     d2 = Card.get(2, :diamonds)
     c7 = Card.get(7, :clubs)
     tableau1 = Tableau.new [h4]
-    tableau2 = Tableau.new [c7, c3]
-    tableau2.append_card! d2
+    tableau2 = Tableau.new [c7], [c3, d2]
 
     tableaus = [tableau1, tableau2]
 
@@ -842,8 +841,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
     d2 = Card.get(2, :diamonds)
     c7 = Card.get(7, :clubs)
     tableau1 = Tableau.new [h4]
-    tableau2 = Tableau.new [c7, c3]
-    tableau2.append_card! d2
+    tableau2 = Tableau.new [c7], [c3, d2]
 
     tableau3 = Tableau.new [Card.get(7, :diamonds)]
     tableau4 = Tableau.new [Card.get(8, :spades)]
@@ -955,5 +953,22 @@ class SolitaireBoardTest < Test::Unit::TestCase
     turns = board.get_stock_turns
 
     assert_equal 0, turns.size
+  end
+
+  def test_get_turns_returns_empty_when_no_turns_avaialble
+    h4 = Card.get(4, :hearts)
+    tableau1 = Tableau.new [h4]
+
+    tableaus = [tableau1]
+
+    state = {
+      :tableaus => tableaus,
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_tableau_turns
+
+    assert turns.empty?
   end
 end

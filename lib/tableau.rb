@@ -7,17 +7,20 @@ require 'validated_stack'
 # the top card from the hidden card when the validated stack is emptied.
 class Tableau < ValidatedStack
 
-  # Initializes the column from the set of cards.  The bottom card is made
-  # visible, and the rest are set as the hidden cards
-  def initialize(cards)
-    if cards.empty?
-      hidden = []
-      visible = []
-    else
-      top_card = cards[-1]
+  # Initializes the column from the set of cards.  If visible is nil then the
+  # bottom card in the cards array/stack is made visible, and the rest are set
+  # as the hidden cards
+  def initialize(cards, visible=nil)
 
+    if visible.nil?
+      visible = cards[-1..-1]
       hidden = cards[0...-1]
-      visible = [top_card]
+
+      # If cards is empty then visible will be set to nil above
+      visible = [] if visible.nil?
+    else
+      hidden = cards[0..-1]
+      visible = visible[0..-1]
     end
 
     @hidden_cards = StackOfCards.new hidden
@@ -57,9 +60,7 @@ class Tableau < ValidatedStack
 
   # Creates a duplicate of this stack
   def dup
-    d = Tableau.new []
-    d.set_data(@hidden_cards, @cards)
-    d
+    Tableau.new @hidden_cards, @cards
   end
 
   # Checks if another stack is equal to this one
@@ -80,10 +81,5 @@ class Tableau < ValidatedStack
 protected
   def hidden_cards
     @hidden_cards
-  end
-
-  def set_data(hidden_cards, visible_cards)
-    @hidden_cards = hidden_cards.dup
-    @cards = visible_cards.dup
   end
 end
