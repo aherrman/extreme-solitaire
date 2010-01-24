@@ -1,9 +1,18 @@
+require 'hash_helper'
+
 # Represents a single turn in the game.
 class Turn
+  include HashHelper
+
   # Initializes the turn.
   def initialize(board)
     @original_board = board
     @finalized = false
+  end
+
+  # The board the turn is acting on
+  def board
+    @original_board.dup
   end
 
   # Trys the turn.  This returns the new board with the turn applied but
@@ -33,7 +42,12 @@ class Turn
     @original_board
   end
 
+  def hash
+    @original_board.hash
+  end
+
 protected
+
   # Applies the turn to the board passed in.  This needs to be implemented by
   # the various turn implementations
   def apply_turn(board)

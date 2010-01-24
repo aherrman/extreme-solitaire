@@ -23,23 +23,31 @@ class SortedQueue
     }
   end
 
+  def to_s
+    to_a.to_s
+  end
+
+  def inspect
+    to_a.inspect
+  end
+
   # Adds an item to the queue
-  def add(item)
+  def add!(item)
     @queue[item] = item
   end
 
   # Adds an item to the queue
   def <<(item)
-    add(item)
+    add!(item)
   end
 
   # Removes an item from the queue
-  def remove(item)
+  def remove!(item)
     @queue.delete(item)
   end
 
   # Removes the first element from the queue
-  def shift
+  def shift!
     shifted = @queue.shift
 
     return nil if shifted.nil?

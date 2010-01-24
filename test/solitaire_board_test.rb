@@ -971,4 +971,48 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     assert turns.empty?
   end
+
+  def test_num_hidden
+    deck = StackOfCards.default_stack
+
+    board = SolitaireBoard.build_from_deck deck
+
+    assert_equal 21, board.num_hidden
+  end
+
+  def test_solved
+    diamonds = Foundation.build_foundation(13, :diamonds)
+    clubs = Foundation.build_foundation(13, :clubs)
+    hearts = Foundation.build_foundation(13, :hearts)
+    spades = Foundation.build_foundation(13, :spades)
+
+    state = {
+      :diamonds_foundation => diamonds,
+      :spades_foundation => spades,
+      :hearts_foundation => hearts,
+      :clubs_foundation => clubs
+    }
+
+    board = SolitaireBoard.new state
+
+    assert board.solved?
+  end
+
+  def test_solved_when_not_solved
+    diamonds = Foundation.build_foundation(13, :diamonds)
+    clubs = Foundation.build_foundation(13, :clubs)
+    hearts = Foundation.build_foundation(13, :hearts)
+    spades = Foundation.build_foundation(12, :spades)
+
+    state = {
+      :diamonds_foundation => diamonds,
+      :spades_foundation => spades,
+      :hearts_foundation => hearts,
+      :clubs_foundation => clubs
+    }
+
+    board = SolitaireBoard.new state
+
+    assert ! board.solved?
+  end
 end

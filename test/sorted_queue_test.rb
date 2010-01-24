@@ -13,11 +13,11 @@ class SortedQueueTest < Test::Unit::TestCase
     queue = SortedQueue.new [1, 5, 3, 4, 2]
 
     assert_equal 5, queue.size
-    assert_equal 1, queue.shift
-    assert_equal 2, queue.shift
-    assert_equal 3, queue.shift
-    assert_equal 4, queue.shift
-    assert_equal 5, queue.shift
+    assert_equal 1, queue.shift!
+    assert_equal 2, queue.shift!
+    assert_equal 3, queue.shift!
+    assert_equal 4, queue.shift!
+    assert_equal 5, queue.shift!
   end
 
   def test_size
@@ -32,21 +32,21 @@ class SortedQueueTest < Test::Unit::TestCase
     queue = SortedQueue.new
 
     queue << 5
-    queue.add 2
+    queue.add! 2
 
-    assert_equal 2, queue.shift
-    assert_equal 5, queue.shift
+    assert_equal 2, queue.shift!
+    assert_equal 5, queue.shift!
   end
 
-  def test_remove
+  def test_remove!
     queue = SortedQueue.new [1, 3, 5, 7]
 
-    queue.remove 3
+    queue.remove! 3
 
-    assert_equal 1, queue.shift
-    assert_equal 5, queue.shift
-    assert_equal 7, queue.shift
-    assert queue.shift.nil?
+    assert_equal 1, queue.shift!
+    assert_equal 5, queue.shift!
+    assert_equal 7, queue.shift!
+    assert queue.shift!.nil?
   end
 
   def test_to_a

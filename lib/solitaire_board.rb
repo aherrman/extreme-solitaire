@@ -123,6 +123,13 @@ class SolitaireBoard
     tableau.num_hidden
   end
 
+  # The total number of hidden cards across all tableaus
+  def num_hidden
+    @tableaus.inject(0) { |sum, tableau|
+      sum + tableau.num_hidden
+    }
+  end
+
   # The card at the top of the waste pile
   def top_waste_card
     # The usable waste card is actually the one on the bottom of the used pile,
@@ -160,6 +167,16 @@ class SolitaireBoard
   # The top card in the spades foundation.
   def spades_foundation_top
     @spades_foundation.bottom
+  end
+
+  # True if the board is solved (all cards are in the foundations), false
+  # otherwise
+  def solved?
+    # We're assuming no invalid boards, but that makes this easier.
+    # If you make an invalid board then that's ALL YOUR FAULT and I don't care
+    # if this is wrong.  :)
+    @diamonds_foundation.size == 13 && @spades_foundation.size == 13 &&
+        @hearts_foundation.size == 13 && @clubs_foundation.size == 13
   end
 
 # ------------------------------------------------------------------------------
@@ -210,7 +227,7 @@ class SolitaireBoard
   # Gets a list of all the valid turns that can be applied to the current
   # board.
   def get_turns
-    get_waste_turns + get_tableau_turns + get_foundation_turns + get_stock_turns
+    get_tableau_turns + get_foundation_turns + get_stock_turns + get_waste_turns
   end
 
   # Gets the possible turns involving moving the top waste card.
@@ -273,7 +290,7 @@ class SolitaireBoard
   # Gets the possible turns involving the stock
   def get_stock_turns
     if !(@stock.empty? && @waste.empty?)
-      [FlipStockTurn.new self]
+      [FlipStockTurn.new(self)]
     else
       []
     end
