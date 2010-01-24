@@ -1,4 +1,3 @@
-* Change board's build_from_deck method to create tableaus the "real" way
 * Create method to pretty-print the solution
 * Create main file so solver can be run from the command line
 * Find a better way to handle the <=> operator for the solver nodes

@@ -85,27 +85,27 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert_equal 0, board.get_num_hidden_cards_for_tableau(0)
 
     t1 = board.get_tableau_cards(1)
-    assert_equal Card.get(12, :diamonds), t1[0]
+    assert_equal Card.get(6, :diamonds), t1[0]
     assert_equal 1, board.get_num_hidden_cards_for_tableau(1)
 
     t2 = board.get_tableau_cards(2)
-    assert_equal Card.get(10, :diamonds), t2[0]
+    assert_equal Card.get(13, :clubs), t2[0]
     assert_equal 2, board.get_num_hidden_cards_for_tableau(2)
 
     t3 = board.get_tableau_cards(3)
-    assert_equal Card.get(7, :diamonds), t3[0]
+    assert_equal Card.get(8, :clubs), t3[0]
     assert_equal 3, board.get_num_hidden_cards_for_tableau(3)
 
     t4 = board.get_tableau_cards(4)
-    assert_equal Card.get(3, :diamonds), t4[0]
+    assert_equal Card.get(4, :clubs), t4[0]
     assert_equal 4, board.get_num_hidden_cards_for_tableau(4)
 
     t5 = board.get_tableau_cards(5)
-    assert_equal Card.get(11, :clubs), t5[0]
+    assert_equal Card.get(1, :clubs), t5[0]
     assert_equal 5, board.get_num_hidden_cards_for_tableau(5)
 
     t6 = board.get_tableau_cards(6)
-    assert_equal Card.get(5, :clubs), t6[0]
+    assert_equal Card.get(12, :spades), t6[0]
     assert_equal 6, board.get_num_hidden_cards_for_tableau(6)
 
     assert_equal 0, board.turn_count

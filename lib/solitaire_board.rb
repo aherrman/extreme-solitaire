@@ -29,14 +29,20 @@ class SolitaireBoard
 
   # Builds a board from a deck of cards
   def self.build_from_deck(deck)
+    deck = deck.dup # so we don't change the deck passed in
     state = Hash.new
 
+    tcards = [[], [], [], [], [], [], []]
+
+    0.upto(6).each do |i|
+      i.upto(6).each do |column|
+        tcards[column] << deck.remove_card!
+      end
+    end
+
     tableaus = []
-
-    (1..7).each do |i|
-      deck, stack = deck.remove_stack(i)
-
-      tableaus.push Tableau.new stack
+    0.upto(6).each do |i|
+      tableaus.push Tableau.new tcards[i]
     end
 
     stock = deck
