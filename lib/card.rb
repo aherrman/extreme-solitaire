@@ -80,6 +80,7 @@ class Card
     fail "Invalid value: #{card_value}" unless validate_value(card_value)
     @value = card_value
     @suit = card_suit
+    @hash = nil
   end
 
 # ------------------------------------------------------------------------------
@@ -113,7 +114,11 @@ class Card
 
   # Generates a unique hash for the Card
   def hash
-    @value.hash ^ @suit.hash
+    # Memoizing such a simple hash value seems silly, however the
+    # profiler showed the Card#hash method as having 22% of the runtime.  My
+    # memoizing the hash value that was reduced to 12%.
+    return @hash unless @hash.nil?
+    @hash = @value.hash ^ @suit.hash
   end
 
   def to_s
