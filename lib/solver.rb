@@ -5,7 +5,18 @@ require 'eql_helper'
 
 # Solitaire solver
 class Solver
+  # True once the solver has run
   attr_reader :solved
+
+  # The number of nodes that were ever queued
+  attr_reader :queued
+
+  # The number of nodes that were skipped because the board had already been
+  # seen
+  attr_reader :skipped
+
+  # The number of nodes that were processed
+  attr_reader :processed
 
   # Initializes the solver
   def initialize(initial_board)
@@ -16,6 +27,9 @@ class Solver
     @to_process = SortedQueue.new
     @solved = false
     @solved_node = nil
+    @skipped = 0
+    @queued = 0
+    @processed = 0
   end
 
   # The board the solver started with
@@ -37,7 +51,6 @@ class Solver
   def solve(&progress)
     return ! @solved_node.nil? if @solved
     @solved = true
-    @skipped = 0
 
     current_turn_count = @start_node.board.turn_count
 
@@ -88,6 +101,8 @@ class Solver
 protected
 
   def process_node(node)
+    @processed += 1
+
     return false if node.nil?
 
     board = node.board
@@ -101,6 +116,7 @@ protected
       unless @seen_boards[new_board]
         @seen_boards[new_board] = true
         @to_process << SolveNode.new(new_board, turn, node)
+        @queued += 1
       else
         @skipped += 1
       end

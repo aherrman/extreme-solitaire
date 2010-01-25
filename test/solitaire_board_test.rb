@@ -972,6 +972,88 @@ class SolitaireBoardTest < Test::Unit::TestCase
     assert turns.empty?
   end
 
+  def test_get_waste_turns_only_allows_one_king_to_tableau_move
+    diamonds = Foundation.build_foundation(13, :diamonds)
+
+    t1 = Tableau.new [Card.get(2, :hearts)],
+        [Card.get(13, :hearts), Card.get(12, :spades)]
+
+    used = StackOfCards.new [Card.get(13, :clubs)]
+    state = {
+      :diamonds_foundation => diamonds,
+      :waste => used,
+      :tableaus => [t1]
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_waste_turns
+
+    assert_equal 1, turns.size
+    assert_equal WasteToTableauTurn, turns[0].class
+  end
+
+  def test_get_tableau_turns_only_allows_one_king_to_tableau_move
+    diamonds = Foundation.build_foundation(13, :diamonds)
+
+    t1 = Tableau.new [Card.get(2, :hearts)],
+        [Card.get(13, :hearts), Card.get(12, :spades)]
+
+    used = StackOfCards.new [Card.get(13, :clubs)]
+    state = {
+      :diamonds_foundation => diamonds,
+      :waste => used,
+      :tableaus => [t1]
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_tableau_turns
+
+    assert_equal 1, turns.size
+    assert_equal TableauToTableauTurn, turns[0].class
+  end
+
+  def test_get_foundation_turns_only_allows_one_king_to_tableau_move
+    diamonds = Foundation.build_foundation(13, :diamonds)
+
+    t1 = Tableau.new [Card.get(2, :hearts)],
+        [Card.get(13, :hearts), Card.get(12, :spades)]
+
+    used = StackOfCards.new [Card.get(13, :clubs)]
+    state = {
+      :diamonds_foundation => diamonds,
+      :waste => used,
+      :tableaus => [t1]
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_foundation_turns
+
+    assert_equal 1, turns.size
+    assert_equal FoundationToTableauTurn, turns[0].class
+  end
+
+  def test_get_tableau_turns_doesnt_move_kings_with_nothing_hidden_under_them
+    diamonds = Foundation.build_foundation(13, :diamonds)
+
+    t1 = Tableau.new [], [Card.get(13, :hearts), Card.get(12, :spades)]
+
+    used = StackOfCards.new [Card.get(13, :clubs)]
+    state = {
+      :diamonds_foundation => diamonds,
+      :waste => used,
+      :tableaus => [t1]
+    }
+
+    board = SolitaireBoard.new state
+
+    turns = board.get_tableau_turns
+
+    assert_equal 0, turns.size
+  end
+
   def test_num_hidden
     deck = StackOfCards.default_stack
 

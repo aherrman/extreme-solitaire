@@ -53,3 +53,7 @@ turns.each do |turn|
   puts turn.to_s
   puts '----------------------------------------------------------------------'
 end
+
+puts "Processed #{solver.processed} nodes"
+puts "Queued #{solver.queued} nodes"
+puts "Skipped #{solver.skipped} nodes"

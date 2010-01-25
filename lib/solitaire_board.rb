@@ -234,6 +234,7 @@ class SolitaireBoard
   # board.
   def get_turns
     get_waste_turns + get_tableau_turns + get_foundation_turns + get_stock_turns
+    #get_waste_turns + get_tableau_turns + get_stock_turns
   end
 
   # Gets the possible turns involving moving the top waste card.
@@ -252,11 +253,10 @@ class SolitaireBoard
       # Ignore the exception, we'll just move on to other possible turns
     end
 
-    @tableaus.each_index do |tableau_index|
-      tableau = @tableaus[tableau_index]
-      if tableau.can_append_card? card
-        turns << WasteToTableauTurn.new(self, tableau_index)
-      end
+    stack = StackOfCards.new [card]
+    indices = get_tableaus_stack_can_be_appended_to(stack)
+    indices.each do |tableau_index|
+      turns << WasteToTableauTurn.new(self, tableau_index)
     end
 
     turns
@@ -571,6 +571,9 @@ private
     tableau = get_tableau_for_move tableau_index
 
     1.upto(tableau.size) do |size|
+      next if (tableau.num_hidden == 0) && (tableau.size > 0) &&
+          (tableau[0].value == Card::KING)
+
       new_tableau, stack = tableau.remove_stack(size)
 
       appendable_indices = get_tableaus_stack_can_be_appended_to(stack)
@@ -594,6 +597,19 @@ private
 
   # Gets the indices of all tableaus the given stack can be appended to.
   def get_tableaus_stack_can_be_appended_to(stack)
+    if stack[0].value == Card::KING
+      index = get_first_tableau_stack_can_be_appended_to(stack)
+      if index.nil?
+        []
+      else
+        [index]
+      end
+    else
+      get_tableaus_stack_can_be_appended_to_impl(stack)
+    end
+  end
+
+  def get_tableaus_stack_can_be_appended_to_impl(stack)
     indices = []
 
     @tableaus.each_index do |tableau_index|
@@ -605,5 +621,25 @@ private
     end
 
     indices
+  end
+
+  # Gets just the first tableau a stack can be appended to.
+  # This mostly meant for finding the first tableau a stack starting with a
+  # King could be appended to, as it doesn't really matter which one the king
+  # is on.  However, it is written to handle any stack, just in case.
+  #
+  # Optionally any indexes that should be ignored (usually just the starting
+  # index) can be passed as extra arguments.
+  def get_first_tableau_stack_can_be_appended_to(stack, *ignored)
+    @tableaus.each_index do |tableau_index|
+      next if ignored.include?(tableau_index)
+      tableau = @tableaus[tableau_index]
+
+      if tableau.can_append?(stack)
+        return tableau_index
+      end
+    end
+
+    return nil
   end
 end
