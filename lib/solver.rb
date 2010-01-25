@@ -30,9 +30,16 @@ class Solver
   end
 
   # Attempts to solve the board.
-  def solve
+  # solve optionally takes a block which it will call to help provide progress
+  # information.  The block takes 3 arguments, the current turn count being
+  # processed, the current queue side, and the number of turns skipped because
+  # the board state was already seen.
+  def solve(&progress)
     return ! @solved_node.nil? if @solved
     @solved = true
+    @skipped = 0
+
+    current_turn_count = @start_node.board.turn_count
 
     current_node = @start_node
 
@@ -46,6 +53,12 @@ class Solver
       else
         current_node = @to_process.shift!
         break if current_node.nil?
+
+        new_turn_count = current_node.board.turn_count
+        if (new_turn_count > current_turn_count) && !progress.nil?
+          progress.call(new_turn_count, @to_process.size, @skipped)
+          current_turn_count = new_turn_count
+        end
       end
     end
 
@@ -88,6 +101,8 @@ protected
       unless @seen_boards[new_board]
         @seen_boards[new_board] = true
         @to_process << SolveNode.new(new_board, turn, node)
+      else
+        @skipped += 1
       end
     end
 
