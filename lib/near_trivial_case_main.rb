@@ -1,28 +1,28 @@
 require 'solver'
 require 'solitaire_board'
 
-def read_int_arg(arg, default=0)
-  value = arg
-  if value.nil?
-    value = default
-  else
-    value = Integer(value)
-  end
-end
+diamonds = Foundation.build_foundation(13, :diamonds)
+clubs = Foundation.build_foundation(11, :clubs)
+hearts = Foundation.build_foundation(12, :hearts)
+spades = Foundation.build_foundation(13, :spades)
 
-deck = StackOfCards.default_stack
+used = StackOfCards.new [Card.get(13, :clubs), Card.get(12, :clubs),
+  Card.get(13, :hearts)]
 
-shuffle_count = read_int_arg ARGV[0]
-max_count = read_int_arg ARGV[1]
-
-deck.shuffle!(shuffle_count)
-board = SolitaireBoard.build_from_deck deck
+state = {
+  :diamonds_foundation => diamonds,
+  :spades_foundation => spades,
+  :hearts_foundation => hearts,
+  :clubs_foundation => clubs,
+  :stock => used,
+}
+board = SolitaireBoard.new state
 
 puts "Solving for board:"
 puts board.to_display_string
 
 solver = Solver.new board
-solver.solve(max_count) { |turn_count, queue_size, skipped|
+solver.solve { |turn_count, queue_size, skipped|
   puts "Checking #{turn_count} - #{solver.processed} / #{queue_size} / #{skipped}"
 }
 

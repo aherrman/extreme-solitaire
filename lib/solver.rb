@@ -44,13 +44,19 @@ class Solver
   end
 
   # Attempts to solve the board.
+  # A maximum number of nodes to process may be passed in.  The solving will
+  # stop once that number of nodes have been processed.  If not provided then
+  # the solver will run to completion.
+  #
+  # If the max count is reached before finishing then the solver will continue
+  # where it left off if solve is called again.
+  #
   # solve optionally takes a block which it will call to help provide progress
   # information.  The block takes 3 arguments, the current turn count being
   # processed, the current queue side, and the number of turns skipped because
   # the board state was already seen.
-  def solve(&progress)
+  def solve(max_count=nil, &progress)
     return ! @solved_node.nil? if @solved
-    @solved = true
 
     current_turn_count = @start_node.board.turn_count
 
@@ -59,6 +65,11 @@ class Solver
     solved = false
 
     while !solved do
+      unless max_count.nil?
+        return false if max_count <= 0
+        max_count -= 1
+      end
+
       solved = process_node(current_node)
 
       if solved
@@ -75,6 +86,7 @@ class Solver
       end
     end
 
+    @solved = true
     solved
   end
 

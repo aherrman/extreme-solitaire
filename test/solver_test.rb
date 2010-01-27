@@ -100,6 +100,58 @@ class SolverTest < Test::Unit::TestCase
     assert_equal 2, turn_count
   end
 
+  def test_solve_obeys_max_count
+    diamonds = Foundation.build_foundation(13, :diamonds)
+    clubs = Foundation.build_foundation(12, :clubs)
+    hearts = Foundation.build_foundation(13, :hearts)
+    spades = Foundation.build_foundation(13, :spades)
+
+    used = StackOfCards.new [Card.get(13, :clubs)]
+
+    state = {
+      :diamonds_foundation => diamonds,
+      :spades_foundation => spades,
+      :hearts_foundation => hearts,
+      :clubs_foundation => clubs,
+      :waste => used,
+    }
+
+    board = SolitaireBoard.new state
+
+    solver = Solver.new board
+
+    solver.solve 5
+
+    assert ! solver.solved
+    assert_equal 5, solver.processed
+  end
+
+  def test_solve_continues_where_it_left_off
+    diamonds = Foundation.build_foundation(13, :diamonds)
+    clubs = Foundation.build_foundation(12, :clubs)
+    hearts = Foundation.build_foundation(13, :hearts)
+    spades = Foundation.build_foundation(13, :spades)
+
+    used = StackOfCards.new [Card.get(13, :clubs)]
+
+    state = {
+      :diamonds_foundation => diamonds,
+      :spades_foundation => spades,
+      :hearts_foundation => hearts,
+      :clubs_foundation => clubs,
+      :waste => used,
+    }
+
+    board = SolitaireBoard.new state
+
+    solver = Solver.new board
+
+    solver.solve 5
+    solver.solve 3
+
+    assert solver.solved
+  end
+
   def test_solver_detects_unsolvable_board
     diamonds = Foundation.build_foundation(10, :diamonds)
     clubs = Foundation.build_foundation(10, :clubs)
