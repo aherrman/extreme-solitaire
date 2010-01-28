@@ -3,8 +3,9 @@ $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 require 'test/unit'
 require 'solitaire_board'
 require 'solver'
+require 'breadth_first_solver'
 
-class SolverTest < Test::Unit::TestCase
+class BreadthFirstSolverTest < Test::Unit::TestCase
 
   def test_solver_solves_already_solved_board
     diamonds = Foundation.build_foundation(13, :diamonds)
@@ -21,7 +22,7 @@ class SolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = Solver.new board
+    solver = BreadthFirstSolver.new board
 
     solver.solve
 
@@ -33,7 +34,7 @@ class SolverTest < Test::Unit::TestCase
 
   def test_solver_doesnt_allow_nill_board
     assert_raise(RuntimeError) {
-      solver = Solver.new nil
+      solver = BreadthFirstSolver.new nil
     }
   end
 
@@ -55,7 +56,7 @@ class SolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = Solver.new board
+    solver = BreadthFirstSolver.new board
 
     solver.solve
 
@@ -89,7 +90,7 @@ class SolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = Solver.new board
+    solver = BreadthFirstSolver.new board
 
     turn_count = 0
 
@@ -102,23 +103,23 @@ class SolverTest < Test::Unit::TestCase
 
   def test_solve_obeys_max_count
     diamonds = Foundation.build_foundation(13, :diamonds)
-    clubs = Foundation.build_foundation(12, :clubs)
-    hearts = Foundation.build_foundation(13, :hearts)
+    clubs = Foundation.build_foundation(11, :clubs)
+    hearts = Foundation.build_foundation(12, :hearts)
     spades = Foundation.build_foundation(13, :spades)
 
-    used = StackOfCards.new [Card.get(13, :clubs)]
+    used = StackOfCards.new [Card.get(13, :clubs), Card.get(12, :clubs),
+      Card.get(13, :hearts)]
 
     state = {
       :diamonds_foundation => diamonds,
       :spades_foundation => spades,
       :hearts_foundation => hearts,
       :clubs_foundation => clubs,
-      :waste => used,
+      :stock => used,
     }
-
     board = SolitaireBoard.new state
 
-    solver = Solver.new board
+    solver = BreadthFirstSolver.new board
 
     solver.solve 5
 
@@ -128,26 +129,27 @@ class SolverTest < Test::Unit::TestCase
 
   def test_solve_continues_where_it_left_off
     diamonds = Foundation.build_foundation(13, :diamonds)
-    clubs = Foundation.build_foundation(12, :clubs)
-    hearts = Foundation.build_foundation(13, :hearts)
+    clubs = Foundation.build_foundation(11, :clubs)
+    hearts = Foundation.build_foundation(12, :hearts)
     spades = Foundation.build_foundation(13, :spades)
 
-    used = StackOfCards.new [Card.get(13, :clubs)]
+    used = StackOfCards.new [Card.get(13, :clubs), Card.get(12, :clubs),
+      Card.get(13, :hearts)]
 
     state = {
       :diamonds_foundation => diamonds,
       :spades_foundation => spades,
       :hearts_foundation => hearts,
       :clubs_foundation => clubs,
-      :waste => used,
+      :stock => used,
     }
 
     board = SolitaireBoard.new state
 
-    solver = Solver.new board
+    solver = BreadthFirstSolver.new board
 
     solver.solve 5
-    solver.solve 3
+    solver.solve
 
     assert solver.solved
   end
@@ -175,7 +177,7 @@ class SolverTest < Test::Unit::TestCase
       :tableaus => [t1, t2, t3, t4]
     }
 
-    solver = Solver.new SolitaireBoard.new state
+    solver = BreadthFirstSolver.new SolitaireBoard.new state
 
     solver.solve
 

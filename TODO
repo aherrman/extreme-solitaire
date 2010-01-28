@@ -1,4 +1,3 @@
-* Create method to pretty-print the solution
 * Find a better way to handle the <=> operator for the solver nodes
 * See if algorithm gem's tree is any faster than rbtree gem's for SortedQueue
 * Look for ways to reduce object duplication

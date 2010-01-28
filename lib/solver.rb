@@ -19,10 +19,10 @@ class Solver
   attr_reader :processed
 
   # Initializes the solver
-  def initialize(initial_board)
+  def initialize(initial_board, &board_compare)
     raise "No board provided" if initial_board.nil?
 
-    @start_node = SolveNode.new initial_board
+    @start_node = SolveNode.new(initial_board, nil, nil, &board_compare)
     @seen_boards = {}
     @to_process = SortedQueue.new
     @solved = false
@@ -30,6 +30,7 @@ class Solver
     @skipped = 0
     @queued = 0
     @processed = 0
+    @board_compare = board_compare
   end
 
   # The board the solver started with
@@ -115,8 +116,6 @@ protected
   def process_node(node)
     @processed += 1
 
-    return false if node.nil?
-
     board = node.board
 
     return true if board.solved?
@@ -127,7 +126,7 @@ protected
       new_board = turn.do_turn
       unless @seen_boards[new_board]
         @seen_boards[new_board] = true
-        @to_process << SolveNode.new(new_board, turn, node)
+        @to_process << SolveNode.new(new_board, turn, node, &@board_compare)
         @queued += 1
       else
         @skipped += 1
@@ -144,37 +143,15 @@ protected
 
     attr_accessor :board, :turn, :prev_node
 
-    def initialize(board, turn=nil, prev_node=nil)
+    def initialize(board, turn, prev_node, &board_compare)
+      @board_compare = board_compare
       @board = board
       @turn = turn
       @prev_node = prev_node
     end
 
     def <=>(other)
-      return 0 if eql?(other)
-
-      comp = board.turn_count <=> other.board.turn_count
-      return comp unless comp == 0
-
-      # In theory the boards that have less hidden cards are closer to being
-      # solved.  By sorting by the number of hidden cards left we'll end up
-      # processing those first, hopefully getting us to the solution sooner.
-      comp = board.num_hidden <=> other.board.num_hidden
-
-      return comp unless comp == 0
-
-      # Anything with the same turn count and number of hidden cards is
-      # considered equal as far as the sorting for solving goes.  However, the
-      # tree requires non-equal objects to not have a sort value of 0.  The
-      # easiest thing to do is to use the hash value and then make sure that
-      # they can never be the same.  It's a hack, but the best I've got for
-      # now.
-      my_hash = hash
-      their_hash = other.hash
-      if my_hash == their_hash
-        their_hash += 1
-      end
-      my_hash <=> their_hash
+      @board_compare.call(@board, other.board)
     end
 
     def hash

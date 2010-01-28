@@ -1,4 +1,4 @@
-require 'solver'
+require 'breadth_first_solver'
 require 'solitaire_board'
 
 def read_int_arg(arg, default=0)
@@ -21,7 +21,7 @@ board = SolitaireBoard.build_from_deck deck
 puts "Solving for board:"
 puts board.to_display_string
 
-solver = Solver.new board
+solver = BreadthFirstSolver.new board
 solver.solve(max_count) { |turn_count, queue_size, skipped|
   puts "Checking #{turn_count} - #{solver.processed} / #{queue_size} / #{skipped}"
 }
