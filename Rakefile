@@ -1,8 +1,3 @@
-# 
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
- 
-
 require 'rubygems'
 require 'rake'
 require 'rake/clean'
@@ -46,7 +41,13 @@ end
 
 task :default => [:run]
 
-task :run do
+task :run, [:t1, :t2] do |t, args|
   cd "lib"
-  ruby "main.rb"
+  if args.t1.nil? && args.t2.nil?
+    ruby "main.rb"
+  elsif args.t2.nil?
+    ruby "main.rb", args.t1
+  else
+    ruby "main.rb", args.t1, args.t2
+  end
 end
