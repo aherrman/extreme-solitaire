@@ -2,8 +2,8 @@ require 'rubygems'
 require 'rake'
 require 'rake/clean'
 require 'rake/gempackagetask'
-require 'rake/rdoctask'
 require 'rake/testtask'
+require 'hanna/rdoctask'
 
 spec = Gem::Specification.new do |s|
   s.name = 'extreme-solitaire'
