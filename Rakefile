@@ -3,7 +3,15 @@ require 'rake'
 require 'rake/clean'
 require 'rake/gempackagetask'
 require 'rake/testtask'
-require 'hanna/rdoctask'
+#require 'rake/rdoctask'
+#require 'hanna/rdoctask'
+begin
+  require 'hanna/rdoctask'
+rescue LoadError
+  puts 'Hanna rdoc unavailable, falling back to rake'
+  require 'rake/rdoctask'
+end
+
 
 spec = Gem::Specification.new do |s|
   s.name = 'extreme-solitaire'
