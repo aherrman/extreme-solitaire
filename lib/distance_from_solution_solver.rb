@@ -14,7 +14,15 @@ class DistanceFromSolutionSolver < Solver
   end
 
   def board_compare(board1, board2)
-    get_distance_from_solution(board1) <=> get_distance_from_solution(board2)
+    c = get_distance_from_solution(board1) <=> get_distance_from_solution(board2)
+
+    return c unless c == 0
+
+    # Any boards with the same distance are considered equal as far as the
+    # algorithm is concerned.  However the sorted queue requires only actually
+    # equal objects to return 0 for the <=> operator, so we'll just compare the
+    # object IDs.
+    board1.object_id <=> board2.object_id
   end
 
   # Calculates the distance a board is from the solution
