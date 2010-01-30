@@ -604,6 +604,7 @@ class SolitaireBoardTest < Test::Unit::TestCase
 
     board.move_from_foundation_to_tableau!(:diamonds, 1)
 
+    assert_equal 2, board.num_diamonds_foundation
     assert_equal 2, board.get_tableau_cards(1).size
     assert_equal s4, board.get_tableau_cards(1)[0]
     assert_equal d3, board.get_tableau_cards(1)[1]

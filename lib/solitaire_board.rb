@@ -153,6 +153,17 @@ class SolitaireBoard
     @waste.size
   end
 
+  # Total number of cards in the foundations
+  def num_in_foundations
+    @diamonds_foundation.size + @hearts_foundation.size +
+        @spades_foundation.size + @clubs_foundation.size
+  end
+
+  # The number of cards in the diamonds foundations
+  def num_diamonds_foundation
+    @diamonds_foundation.size
+  end
+
   # The top card in the diamonds foundation.
   def diamonds_foundation_top
     # All stacks move down, but the foundations are viewed differently, so the
@@ -160,14 +171,29 @@ class SolitaireBoard
     @diamonds_foundation.bottom
   end
 
+  # The number of cards in the hearts foundations
+  def num_hearts_foundation
+    @hearts_foundation.size
+  end
+
   # The top card in the hearts foundation.
   def hearts_foundation_top
     @hearts_foundation.bottom
   end
 
+  # The number of cards in the clubs foundations
+  def num_clubs_foundation
+    @clubs_foundation.size
+  end
+
   # The top card in the clubs foundation.
   def clubs_foundation_top
     @clubs_foundation.bottom
+  end
+
+  # The number of cards in the spades foundations
+  def num_spades_foundation
+    @spades_foundation.size
   end
 
   # The top card in the spades foundation.
@@ -196,6 +222,7 @@ class SolitaireBoard
   end
 
   def to_display_string
+    # Foundations and waste/stock
     s = ""
     s << Card.card_to_s(@diamonds_foundation.bottom, true)
     s << "  "
@@ -210,6 +237,19 @@ class SolitaireBoard
     s << "(#{num_stock_cards})"
     s << "\n\n"
 
+    blanks_left = (Card::HIDDEN_CARD_STRING.size - 1) / 2
+    blanks_right = Card::HIDDEN_CARD_STRING.size - 1 - blanks_left
+
+    # Tableau headers
+    @tableaus.each_index do |index|
+      (0...blanks_left).each { s << " " }
+      s << index.to_s
+      (0...blanks_right).each { s << " " }
+      s << "  "
+    end
+    s << "\n"
+
+    # Tableaus
     max_cards = @tableaus.inject(0) do |max, tableau|
       count = tableau.num_hidden + tableau.size
       count > max ? count : max
@@ -385,7 +425,7 @@ class SolitaireBoard
 
       new_to_tableau = to_tableau.append_card card
 
-      set_foundation_after_move(suit, foundation)
+      set_foundation_after_move(suit, new_foundation)
       set_tableau_after_move(to_tableau_index, new_to_tableau)
     end
   end

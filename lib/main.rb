@@ -1,4 +1,5 @@
-require 'breadth_first_solver'
+require 'distance_from_solution_solver'
+require 'turn_count_solver'
 require 'solitaire_board'
 
 def read_int_arg(arg, default=0)
@@ -10,10 +11,12 @@ def read_int_arg(arg, default=0)
   end
 end
 
+interactive = false
+
 deck = StackOfCards.default_stack
 
 shuffle_count = read_int_arg ARGV[0]
-max_count = read_int_arg ARGV[1]
+max_count = read_int_arg ARGV[1], nil
 
 deck.shuffle!(shuffle_count)
 board = SolitaireBoard.build_from_deck deck
@@ -21,24 +24,29 @@ board = SolitaireBoard.build_from_deck deck
 puts "Solving for board:"
 puts board.to_display_string
 
-solver = BreadthFirstSolver.new board
-solver.solve(max_count) { |turn_count, queue_size, skipped|
-  puts "Checking #{turn_count} - #{solver.processed} / #{queue_size} / #{skipped}"
-}
+#solver = TurnCountSolver.new board
+solver = DistanceFromSolutionSolver.new board
+solver.solve(max_count)
+#solver.solve(max_count) { |turn_count, queue_size, skipped|
+#  puts "Checking #{turn_count} - #{solver.processed} / #{queue_size} / #{skipped}"
+#}
 
 if ! solver.solution_exists?
   puts "No solution exists\n"
-  exit
-end
+else
+  puts "Solution exists!"
 
-puts "Solution exists!"
+  turns = solver.get_solution_turns
 
-turns = solver.get_solution_turns
+  turns.each do |turn|
+    print "\e[2J\e[f" if interactive
+    puts turn.board.to_display_string
+    puts turn.to_s
+    puts '----------------------------------------------------------------------'
+    gets if interactive
+  end
 
-turns.each do |turn|
-  puts turn.board.to_display_string
-  puts turn.to_s
-  puts '----------------------------------------------------------------------'
+  puts "Solved in #{turns[-1].board.turn_count}"
 end
 
 puts "Processed #{solver.processed} nodes"

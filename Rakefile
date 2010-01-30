@@ -3,8 +3,6 @@ require 'rake'
 require 'rake/clean'
 require 'rake/gempackagetask'
 require 'rake/testtask'
-#require 'rake/rdoctask'
-#require 'hanna/rdoctask'
 begin
   require 'hanna/rdoctask'
 rescue LoadError

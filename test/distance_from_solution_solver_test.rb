@@ -3,10 +3,9 @@ $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 require 'test/unit'
 require 'solitaire_board'
 require 'solver'
-require 'breadth_first_solver'
+require 'distance_from_solution_solver'
 
-class BreadthFirstSolverTest < Test::Unit::TestCase
-
+class DistanceFromSolutionSolverTest < Test::Unit::TestCase
   def test_solver_solves_already_solved_board
     diamonds = Foundation.build_foundation(13, :diamonds)
     clubs = Foundation.build_foundation(13, :clubs)
@@ -22,7 +21,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = BreadthFirstSolver.new board
+    solver = DistanceFromSolutionSolver.new board
 
     solver.solve
 
@@ -34,7 +33,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
 
   def test_solver_doesnt_allow_nill_board
     assert_raise(RuntimeError) {
-      solver = BreadthFirstSolver.new nil
+      solver = DistanceFromSolutionSolver.new nil
     }
   end
 
@@ -56,7 +55,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = BreadthFirstSolver.new board
+    solver = DistanceFromSolutionSolver.new board
 
     solver.solve
 
@@ -90,7 +89,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = BreadthFirstSolver.new board
+    solver = DistanceFromSolutionSolver.new board
 
     turn_count = 0
 
@@ -119,7 +118,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
     }
     board = SolitaireBoard.new state
 
-    solver = BreadthFirstSolver.new board
+    solver = DistanceFromSolutionSolver.new board
 
     solver.solve 5
 
@@ -146,7 +145,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
 
     board = SolitaireBoard.new state
 
-    solver = BreadthFirstSolver.new board
+    solver = DistanceFromSolutionSolver.new board
 
     solver.solve 5
     solver.solve
@@ -177,7 +176,7 @@ class BreadthFirstSolverTest < Test::Unit::TestCase
       :tableaus => [t1, t2, t3, t4]
     }
 
-    solver = BreadthFirstSolver.new SolitaireBoard.new state
+    solver = DistanceFromSolutionSolver.new SolitaireBoard.new state
 
     solver.solve
 

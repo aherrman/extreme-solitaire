@@ -1,7 +1,12 @@
 require 'solver'
 
-
-class BreadthFirstSolver < Solver
+# Solver implementation that sorts based on the turn count of the boards.  This
+# causes a breadth-first search.  This solver is guaranteed to return the
+# optimal solution.
+#
+# Due to the size of the problem space this solve method will generally not
+# complete except in trivial situations.
+class TurnCountSolver < Solver
   def initialize(initial_board)
     # TODO: Figure out the right syntax to pass this in directly
     super(initial_board) { |b1, b2| board_compare b1, b2 }
@@ -22,15 +27,9 @@ class BreadthFirstSolver < Solver
 
     # Anything with the same turn count and number of hidden cards is
     # considered equal as far as the sorting for solving goes.  However, the
-    # tree requires non-equal objects to not have a sort value of 0.  The
-    # easiest thing to do is to use the hash value and then make sure that
-    # they can never be the same.  It's a hack, but the best I've got for
-    # now.
-    my_hash = board1.hash
-    their_hash = board2.hash
-    if my_hash == their_hash
-      their_hash += 1
-    end
-    my_hash <=> their_hash
+    # tree requires non-equal objects to not have a sort value of 0.
+    # The quickest solution is to just use the object IDs of the boards.  This
+    # should result in consistent ordering
+    board1.object_id <=> board2.object_id
   end
 end
