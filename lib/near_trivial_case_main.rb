@@ -1,4 +1,4 @@
-require 'breadth_first_solver'
+require 'turn_count_solver'
 require 'solitaire_board'
 
 diamonds = Foundation.build_foundation(13, :diamonds)
@@ -21,7 +21,7 @@ board = SolitaireBoard.new state
 puts "Solving for board:"
 puts board.to_display_string
 
-solver = BreadthFirstSolver.new board
+solver = TurnCountSolver.new board
 solver.solve { |turn_count, queue_size, skipped|
   puts "Checking #{turn_count} - #{solver.processed} / #{queue_size} / #{skipped}"
 }
