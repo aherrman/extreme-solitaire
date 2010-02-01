@@ -73,7 +73,6 @@ else
   solver = DistanceFromSolutionSolver.new board
 end
 
-
 solver.solve(max_steps)
 
 if ! solver.solution_exists?

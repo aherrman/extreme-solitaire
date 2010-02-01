@@ -71,35 +71,6 @@ class DistanceFromSolutionSolverTest < Test::Unit::TestCase
     assert new_board.solved?
   end
 
-  def test_solve_calls_progress_callback
-    diamonds = Foundation.build_foundation(13, :diamonds)
-    clubs = Foundation.build_foundation(12, :clubs)
-    hearts = Foundation.build_foundation(13, :hearts)
-    spades = Foundation.build_foundation(13, :spades)
-
-    used = StackOfCards.new [Card.get(13, :clubs)]
-
-    state = {
-      :diamonds_foundation => diamonds,
-      :spades_foundation => spades,
-      :hearts_foundation => hearts,
-      :clubs_foundation => clubs,
-      :stock => used,
-    }
-
-    board = SolitaireBoard.new state
-
-    solver = DistanceFromSolutionSolver.new board
-
-    turn_count = 0
-
-    solver.solve { |tc, queue_size, skipped|
-      turn_count = tc
-    }
-
-    assert_equal 2, turn_count
-  end
-
   def test_solve_obeys_max_count
     diamonds = Foundation.build_foundation(13, :diamonds)
     clubs = Foundation.build_foundation(11, :clubs)
