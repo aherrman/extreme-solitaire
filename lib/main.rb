@@ -3,100 +3,154 @@ require 'turn_count_solver'
 require 'solitaire_board'
 require 'optparse'
 
-def print_help(opts)
-  puts opts
-  exit
-end
-
-options = {
-  :interactive => false,
-  :clear => false,
-  :shuffles => 0,
-  :solver => :distance,
-  :max_steps => nil
-}
-
-optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: main.rb [options]"
-
-  opts.on('-i', '--interactive', 'Display the solution interactively') {
-    options[:interactive] = true
-  }
-
-  opts.on('-c', '--clear',
-      'Clears the console between each turn display when in interactive mode') {
-    options[:clear] = true
-  }
-
-  opts.on('-s', '--shuffles SHUFFLES', Integer,
-      'Number of times to shuffle the deck') { |s|
-    options[:shuffles] = s
-  }
-
-  opts.on('-m', '--max_steps MAX_STEPS', Integer,
-      'Maximum number of steps to run') { |m|
-    options[:max_steps] = m
-  }
-
-  opts.on('--solver SOLVER', [:distance, :turn],
-      'The solver to use.  Either distance or turn') { |s|
-    options[:solver] = s
-  }
-
-  opts.on('-h', '--help', 'Display usage') {
-    print_help opts
-  }
-end
-
-begin
-  optparse.parse ARGV
-rescue RuntimeError
-  print_help optparse
-end
-
-interactive = options[:interactive]
-clear = options[:clear]
-shuffle_count = options[:shuffles]
-max_steps = options[:max_steps]
-
-deck = StackOfCards.default_stack
-
-deck.shuffle!(shuffle_count)
-board = SolitaireBoard.build_from_deck deck
-
-puts "Solving for board:"
-puts board.to_display_string
-
-if options[:solver] == :turn
-  solver = TurnCountSolver.new board
-else
-  solver = DistanceFromSolutionSolver.new board
-end
-
-solver.solve(max_steps)
-
-if ! solver.solution_exists?
-  puts "No solution exists\n"
-else
-  puts "Solution exists!"
-
-  turns = solver.get_solution_turns
-  num_turns = turns[-1].board.turn_count
-
-  turns.each do |turn|
-    if interactive
-      STDIN.gets
-      print "\e[2J\e[f" if clear
-    end
-    puts "Turn ##{turn.board.turn_count} of #{num_turns}"
-    puts turn.board.to_display_string
-    puts turn.to_s
-    puts '----------------------------------------------------------------------'
+class Main
+  CLEAR_STR = "\e[2J\e[f"
+  def print_help(opts)
+    puts opts
+    exit
   end
 
-  puts "Solved in #{num_turns}"
+  def setup_board(options)
+    shuffle_count = options[:shuffles]
+
+    deck = StackOfCards.default_stack
+
+    deck.shuffle!(shuffle_count)
+    SolitaireBoard.build_from_deck deck
+  end
+
+  def setup_turn_count_solver(board)
+    last_turn_count = 0
+    solver = TurnCountSolver.new board
+
+    solver.on_progress do |count, processed, queued, skipped|
+      if count > last_turn_count
+        print "\rOn turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
+        last_turn_count = count
+      end
+    end
+
+    solver
+  end
+
+  def setup_distance_solver(board)
+    solver = DistanceFromSolutionSolver.new board
+
+    solver.on_progress do |count, processed, queued, skipped|
+      print "\rOn turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
+    end
+
+    solver
+  end
+
+  def setup_solver(board, options)
+    if options[:solver] == :turn
+      setup_turn_count_solver board
+    else
+      setup_distance_solver board
+    end
+  end
+
+  def print_solution(solver, options)
+    interactive = options[:interactive]
+    clear = options[:clear]
+
+    if ! solver.solution_exists?
+      puts "No solution exists\n"
+    else
+      puts "Solution exists!"
+
+      turns = solver.get_solution_turns
+      num_turns = turns[-1].board.turn_count
+
+      turns.each do |turn|
+        if interactive
+          STDIN.gets
+          print Main::CLEAR_STR if clear
+        end
+        puts "Turn ##{turn.board.turn_count} of #{num_turns}"
+        puts turn.board.to_display_string
+        puts turn.to_s
+        puts '----------------------------------------------------------------------'
+      end
+
+      puts "Solved in #{num_turns}"
+    end
+
+    puts "Processed #{solver.processed} nodes"
+    puts "Queued #{solver.queued} nodes"
+    puts "Skipped #{solver.skipped} nodes"
+  end
+
+  def load_options
+    options = {
+      :interactive => false,
+      :clear => false,
+      :shuffles => 0,
+      :solver => :distance,
+      :max_steps => nil
+    }
+
+    optparse = OptionParser.new do |opts|
+      opts.banner = "Usage: main.rb [options]"
+
+      opts.on('-i', '--interactive', 'Display the solution interactively') {
+        options[:interactive] = true
+      }
+
+      opts.on('-c', '--clear',
+          'Clears the console between each turn display when in interactive mode') {
+        options[:clear] = true
+      }
+
+      opts.on('-s', '--shuffles SHUFFLES', Integer,
+          'Number of times to shuffle the deck') { |s|
+        options[:shuffles] = s
+      }
+
+      opts.on('-m', '--max_steps MAX_STEPS', Integer,
+          'Maximum number of steps to run') { |m|
+        options[:max_steps] = m
+      }
+
+      opts.on('--solver SOLVER', [:distance, :turn],
+          'The solver to use.  Either distance or turn') { |s|
+        options[:solver] = s
+      }
+
+      opts.on('-h', '--help', 'Display usage') {
+        print_help opts
+      }
+    end
+
+    begin
+      optparse.parse ARGV
+    rescue RuntimeError
+      print_help optparse
+    end
+
+    options
+  end
+
+  def run
+    options = load_options
+    board = setup_board(options)
+
+    clear = options[:clear]
+
+    print Main::CLEAR_STR if clear
+
+    puts "Solving for board:"
+    puts board.to_display_string
+
+    solver = setup_solver(board, options)
+
+    max_steps = options[:max_steps]
+    solver.solve(max_steps)
+
+    print_solution(solver, options)
+  end
 end
 
-puts "Processed #{solver.processed} nodes"
-puts "Queued #{solver.queued} nodes"
-puts "Skipped #{solver.skipped} nodes"
+main = Main.new
+main.run

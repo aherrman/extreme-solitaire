@@ -31,6 +31,18 @@ class Solver
     @queued = 0
     @processed = 0
     @board_compare = board_compare
+    @progress = nil
+  end
+
+  # Sets the block to call to report progress.  This callback is called every
+  # time a node is going to be processed, so generally it shouldn't do anything
+  # expensive.
+  #
+  # The callback is passed the turn count of the current board, the number of
+  # nodes that have been processed, the size of the to_process queue, and the
+  # number of nodes that were skipped.
+  def on_progress(&progress)
+    @progress = progress
   end
 
   # The board the solver started with
@@ -62,6 +74,11 @@ class Solver
       unless max_count.nil?
         return false if max_count <= 0
         max_count -= 1
+      end
+
+      unless @progress.nil?
+        @progress.call(current_node.board.turn_count, @processed,
+                      @to_process.size, @skipped)
       end
 
       solved = process_node(current_node)
