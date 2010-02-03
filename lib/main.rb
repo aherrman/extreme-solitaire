@@ -23,13 +23,15 @@ class Main
     SolitaireBoard.build_from_deck deck
   end
 
-  def setup_turn_count_solver(board)
+  def setup_turn_count_solver(board, options)
     last_turn_count = 0
     solver = TurnCountSolver.new board
+    clear = options[:clear]
 
     solver.on_progress do |count, processed, queued, skipped|
       if count > last_turn_count
-        print "\rOn turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
+        print clear ? "\r" : "\n"
+        print "On turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
         last_turn_count = count
       end
     end
@@ -37,11 +39,18 @@ class Main
     solver
   end
 
-  def setup_distance_solver(board)
+  def setup_distance_solver(board, options)
+    last_time = Time.at(0)
     solver = DistanceFromSolutionSolver.new board
+    clear = options[:clear]
 
     solver.on_progress do |count, processed, queued, skipped|
-      print "\rOn turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
+      now = Time.now
+      if now > (last_time + 1)
+        print clear ? "\r" : "\n"
+        print "On turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
+        last_time = now
+      end
     end
 
     solver
@@ -49,15 +58,17 @@ class Main
 
   def setup_solver(board, options)
     if options[:solver] == :turn
-      setup_turn_count_solver board
+      setup_turn_count_solver board, options
     else
-      setup_distance_solver board
+      setup_distance_solver board, options
     end
   end
 
   def print_solution(solver, options)
     interactive = options[:interactive]
     clear = options[:clear]
+
+    print "\n"
 
     if ! solver.solution_exists?
       puts "No solution exists\n"
