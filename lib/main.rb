@@ -15,6 +15,10 @@ class Main
 
     deck = StackOfCards.default_stack
 
+    unless options[:rand_seed].nil?
+      srand options[:rand_seed]
+    end
+
     deck.shuffle!(shuffle_count)
     SolitaireBoard.build_from_deck deck
   end
@@ -88,6 +92,7 @@ class Main
       :clear => false,
       :shuffles => 0,
       :solver => :distance,
+      :rand_seed => nil,
       :max_steps => nil
     }
 
@@ -116,6 +121,12 @@ class Main
       opts.on('--solver SOLVER', [:distance, :turn],
           'The solver to use.  Either distance or turn') { |s|
         options[:solver] = s
+      }
+
+      opts.on('-r', '--random_seed SEED', Integer,
+          'The random seed to use.  If not provided then the ruby ' \
+          'default is used.') { |s|
+        options[:rand_seed] = s
       }
 
       opts.on('-h', '--help', 'Display usage') {
