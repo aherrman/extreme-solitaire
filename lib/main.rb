@@ -25,14 +25,18 @@ class Main
 
   def setup_turn_count_solver(board, options)
     last_turn_count = 0
+    last_time = Time.at(0)
+    dtime = options[:progress_time]
     solver = TurnCountSolver.new board
     clear = options[:clear]
 
     solver.on_progress do |count, processed, queued, skipped|
-      if count > last_turn_count
+      now = Time.now
+      if count > last_turn_count || now > (last_time + dtime)
         print clear ? "\r" : "\n"
         print "On turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
         last_turn_count = count
+        last_time = now
       end
     end
 
@@ -43,10 +47,11 @@ class Main
     last_time = Time.at(0)
     solver = DistanceFromSolutionSolver.new board
     clear = options[:clear]
+    dtime = options[:progress_time]
 
     solver.on_progress do |count, processed, queued, skipped|
       now = Time.now
-      if now > (last_time + 1)
+      if now > (last_time + dtime)
         print clear ? "\r" : "\n"
         print "On turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
         last_time = now
@@ -104,6 +109,7 @@ class Main
       :shuffles => 0,
       :solver => :distance,
       :rand_seed => nil,
+      :progress_time => 1,
       :max_steps => nil
     }
 
@@ -138,6 +144,11 @@ class Main
           'The random seed to use.  If not provided then the ruby ' \
           'default is used.') { |s|
         options[:rand_seed] = s
+      }
+
+      opts.on('-t', '--progress_time TIME', Integer,
+          'The max time in seconds between progress displays') { |t|
+        options[:progress_time] = t
       }
 
       opts.on('-h', '--help', 'Display usage') {
