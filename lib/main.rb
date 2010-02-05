@@ -29,8 +29,9 @@ class Main
     dtime = options[:progress_time]
     solver = TurnCountSolver.new board
     clear = options[:clear]
+    max_steps = options[:max_steps]
 
-    solver.on_progress do |count, processed, queued, skipped|
+    solver.on_process do |count, processed, queued, skipped|
       now = Time.now
       if count > last_turn_count || now > (last_time + dtime)
         print clear ? "\r" : "\n"
@@ -38,6 +39,7 @@ class Main
         last_turn_count = count
         last_time = now
       end
+      max_steps.nil? || processed < max_steps
     end
 
     solver
@@ -48,14 +50,16 @@ class Main
     solver = DistanceFromSolutionSolver.new board
     clear = options[:clear]
     dtime = options[:progress_time]
+    max_steps = options[:max_steps]
 
-    solver.on_progress do |count, processed, queued, skipped|
+    solver.on_process do |count, processed, queued, skipped|
       now = Time.now
       if now > (last_time + dtime)
         print clear ? "\r" : "\n"
         print "On turn #{count} - p: #{processed} q: #{queued} s: #{skipped}"
         last_time = now
       end
+      max_steps.nil? || processed < max_steps
     end
 
     solver
@@ -178,8 +182,7 @@ class Main
 
     solver = setup_solver(board, options)
 
-    max_steps = options[:max_steps]
-    solver.solve(max_steps)
+    solver.solve
 
     print_solution(solver, options)
   end

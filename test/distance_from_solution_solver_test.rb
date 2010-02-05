@@ -71,7 +71,7 @@ class DistanceFromSolutionSolverTest < Test::Unit::TestCase
     assert new_board.solved?
   end
 
-  def test_solve_obeys_max_count
+  def test_solve_obeys_callback_return
     diamonds = Foundation.build_foundation(13, :diamonds)
     clubs = Foundation.build_foundation(11, :clubs)
     hearts = Foundation.build_foundation(12, :hearts)
@@ -91,10 +91,12 @@ class DistanceFromSolutionSolverTest < Test::Unit::TestCase
 
     solver = DistanceFromSolutionSolver.new board
 
-    solver.solve 5
+    solver.solve { |count, processed, queued, skipped|
+      processed < 2
+    }
 
     assert ! solver.solved
-    assert_equal 5, solver.processed
+    assert_equal 2, solver.processed
   end
 
   def test_solve_continues_where_it_left_off
@@ -118,8 +120,10 @@ class DistanceFromSolutionSolverTest < Test::Unit::TestCase
 
     solver = DistanceFromSolutionSolver.new board
 
-    solver.solve 5
-    solver.solve
+    solver.solve { |count, processed, queued, skipped|
+      processed < 2
+    }
+    solver.solve { true }
 
     assert solver.solved
   end

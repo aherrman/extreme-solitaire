@@ -34,15 +34,20 @@ class Solver
     @progress = nil
   end
 
-  # Sets the block to call to report progress.  This callback is called every
-  # time a node is going to be processed, so generally it shouldn't do anything
-  # expensive.
+  # Sets the callback to call each time a node is to be processed.
+  #
+  # This callback is called every time a node is going to be processed, so
+  # generally it shouldn't do anything expensive.
   #
   # The callback is passed the turn count of the current board, the number of
   # nodes that have been processed, the size of the to_process queue, and the
   # number of nodes that were skipped.
-  def on_progress(&progress)
-    @progress = progress
+  #
+  # The callback is expected to return a boolean value that tells the solver
+  # whether or not it should continue to run.  This allows the callback to be
+  # used to stop processing at a particular point.
+  def on_process(&callback)
+    @callback = callback
   end
 
   # The board the solver started with
@@ -57,28 +62,23 @@ class Solver
   end
 
   # Attempts to solve the board.
-  # A maximum number of nodes to process may be passed in.  The solving will
-  # stop once that number of nodes have been processed.  If not provided then
-  # the solver will run to completion.
   #
-  # If the max count is reached before finishing then the solver will continue
-  # where it left off if solve is called again.
-  def solve(max_count=nil)
+  # Optionally a callback block can be passed in to solve.  This will replace
+  # any callback passed to on_process
+  def solve(&callback)
     return ! @solved_node.nil? if @solved
+
+    @callback = callback unless callback.nil?
 
     current_node = @start_node
 
     solved = false
 
     while !solved do
-      unless max_count.nil?
-        return false if max_count <= 0
-        max_count -= 1
-      end
-
-      unless @progress.nil?
-        @progress.call(current_node.board.turn_count, @processed,
+      unless @callback.nil?
+        continue = @callback.call(current_node.board.turn_count, @processed,
                       @to_process.size, @skipped)
+        return false unless continue
       end
 
       solved = process_node(current_node)
