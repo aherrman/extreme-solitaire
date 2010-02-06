@@ -150,7 +150,7 @@ class Main
         options[:rand_seed] = s
       }
 
-      opts.on('-t', '--progress_time TIME', Integer,
+      opts.on('-t', '--progress_time TIME', Float,
           'The max time in seconds between progress displays') { |t|
         options[:progress_time] = t
       }
