@@ -2,15 +2,24 @@ require 'distance_from_solution_solver'
 require 'turn_count_solver'
 require 'solitaire_board'
 require 'optparse'
+require 'board_json'
 
 class Main
   CLEAR_STR = "\e[2J\e[f"
-  def print_help(opts)
-    puts opts
+  def print_help
+    puts @optparse
     exit
   end
 
   def setup_board(options)
+    file = options[:initial_board]
+
+    return setup_board_from_deck(options) if file.nil?
+
+    setup_board_from_file(options)
+  end
+
+  def setup_board_from_deck(options)
     shuffle_count = options[:shuffles]
 
     deck = StackOfCards.default_stack
@@ -21,6 +30,20 @@ class Main
 
     deck.shuffle!(shuffle_count)
     SolitaireBoard.build_from_deck deck
+  end
+
+  def setup_board_from_file(options)
+    file = options[:initial_board]
+
+    begin
+      JSON.parse IO.read(file)
+    rescue JSON::ParserError => e
+      puts "Error parsing board file: #{e.message}"
+      print_help
+    rescue Exception => e
+      puts "Error reading board: #{e.message}"
+      print_help
+    end
   end
 
   def setup_turn_count_solver(board, options)
@@ -114,10 +137,11 @@ class Main
       :solver => :distance,
       :rand_seed => nil,
       :progress_time => 1,
+      :initial_board => nil,
       :max_steps => nil
     }
 
-    optparse = OptionParser.new do |opts|
+    @optparse = OptionParser.new do |opts|
       opts.banner = "Usage: main.rb [options]"
 
       opts.on('-i', '--interactive', 'Display the solution interactively') {
@@ -155,15 +179,19 @@ class Main
         options[:progress_time] = t
       }
 
+      opts.on('-b', '--board BOARD', 'The initial board to use instead of shuffling the deck') { |b|
+        options[:initial_board] = b
+      }
+
       opts.on('-h', '--help', 'Display usage') {
-        print_help opts
+        print_help
       }
     end
 
     begin
-      optparse.parse ARGV
+      @optparse.parse ARGV
     rescue RuntimeError
-      print_help optparse
+      print_help
     end
 
     options

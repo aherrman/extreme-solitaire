@@ -1,0 +1,378 @@
+{
+  "json_class": "SolitaireBoard",
+  "state": {
+    "hearts_foundation": {
+      "suit": "hearts",
+      "cards": [
+
+      ],
+      "json_class": "Foundation"
+    },
+    "spades_foundation": {
+      "suit": "spades",
+      "cards": [
+
+      ],
+      "json_class": "Foundation"
+    },
+    "diamonds_foundation": {
+      "suit": "diamonds",
+      "cards": [
+
+      ],
+      "json_class": "Foundation"
+    },
+    "waste": {
+      "cards": [
+
+      ],
+      "json_class": "StackOfCards"
+    },
+    "tableaus": [
+      {
+        "cards": [
+          {
+            "suit": "diamonds",
+            "json_class": "Card",
+            "value": 4
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+
+          ],
+          "json_class": "StackOfCards"
+        }
+      },
+      {
+        "cards": [
+          {
+            "suit": "spades",
+            "json_class": "Card",
+            "value": 12
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 8
+            }
+          ],
+          "json_class": "StackOfCards"
+        }
+      },
+      {
+        "cards": [
+          {
+            "suit": "spades",
+            "json_class": "Card",
+            "value": 6
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+            {
+              "suit": "hearts",
+              "json_class": "Card",
+              "value": 7
+            },
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 13
+            }
+          ],
+          "json_class": "StackOfCards"
+        }
+      },
+      {
+        "cards": [
+          {
+            "suit": "clubs",
+            "json_class": "Card",
+            "value": 1
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 6
+            },
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 3
+            },
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 9
+            }
+          ],
+          "json_class": "StackOfCards"
+        }
+      },
+      {
+        "cards": [
+          {
+            "suit": "spades",
+            "json_class": "Card",
+            "value": 13
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+            {
+              "suit": "clubs",
+              "json_class": "Card",
+              "value": 5
+            },
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 11
+            },
+            {
+              "suit": "hearts",
+              "json_class": "Card",
+              "value": 6
+            },
+            {
+              "suit": "clubs",
+              "json_class": "Card",
+              "value": 6
+            }
+          ],
+          "json_class": "StackOfCards"
+        }
+      },
+      {
+        "cards": [
+          {
+            "suit": "clubs",
+            "json_class": "Card",
+            "value": 9
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+            {
+              "suit": "hearts",
+              "json_class": "Card",
+              "value": 5
+            },
+            {
+              "suit": "diamonds",
+              "json_class": "Card",
+              "value": 1
+            },
+            {
+              "suit": "spades",
+              "json_class": "Card",
+              "value": 3
+            },
+            {
+              "suit": "spades",
+              "json_class": "Card",
+              "value": 8
+            },
+            {
+              "suit": "clubs",
+              "json_class": "Card",
+              "value": 2
+            }
+          ],
+          "json_class": "StackOfCards"
+        }
+      },
+      {
+        "cards": [
+          {
+            "suit": "hearts",
+            "json_class": "Card",
+            "value": 10
+          }
+        ],
+        "json_class": "Tableau",
+        "hidden": {
+          "cards": [
+            {
+              "suit": "hearts",
+              "json_class": "Card",
+              "value": 13
+            },
+            {
+              "suit": "clubs",
+              "json_class": "Card",
+              "value": 13
+            },
+            {
+              "suit": "clubs",
+              "json_class": "Card",
+              "value": 7
+            },
+            {
+              "suit": "hearts",
+              "json_class": "Card",
+              "value": 2
+            },
+            {
+              "suit": "spades",
+              "json_class": "Card",
+              "value": 7
+            },
+            {
+              "suit": "clubs",
+              "json_class": "Card",
+              "value": 3
+            }
+          ],
+          "json_class": "StackOfCards"
+        }
+      }
+    ],
+    "clubs_foundation": {
+      "suit": "clubs",
+      "cards": [
+
+      ],
+      "json_class": "Foundation"
+    },
+    "turn_count": 0,
+    "stock": {
+      "cards": [
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 9
+        },
+        {
+          "suit": "diamonds",
+          "json_class": "Card",
+          "value": 7
+        },
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 11
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 9
+        },
+        {
+          "suit": "diamonds",
+          "json_class": "Card",
+          "value": 5
+        },
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 3
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 10
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 5
+        },
+        {
+          "suit": "diamonds",
+          "json_class": "Card",
+          "value": 10
+        },
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 8
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 2
+        },
+        {
+          "suit": "clubs",
+          "json_class": "Card",
+          "value": 4
+        },
+        {
+          "suit": "diamonds",
+          "json_class": "Card",
+          "value": 2
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 4
+        },
+        {
+          "suit": "diamonds",
+          "json_class": "Card",
+          "value": 12
+        },
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 12
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 1
+        },
+        {
+          "suit": "clubs",
+          "json_class": "Card",
+          "value": 12
+        },
+        {
+          "suit": "clubs",
+          "json_class": "Card",
+          "value": 8
+        },
+        {
+          "suit": "clubs",
+          "json_class": "Card",
+          "value": 11
+        },
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 1
+        },
+        {
+          "suit": "spades",
+          "json_class": "Card",
+          "value": 11
+        },
+        {
+          "suit": "hearts",
+          "json_class": "Card",
+          "value": 4
+        },
+        {
+          "suit": "clubs",
+          "json_class": "Card",
+          "value": 10
+        }
+      ],
+      "json_class": "StackOfCards"
+    }
+  }
+}
